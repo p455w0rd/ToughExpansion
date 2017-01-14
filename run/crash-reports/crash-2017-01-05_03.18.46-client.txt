@@ -1,0 +1,120 @@
+---- Minecraft Crash Report ----
+// You should try our sister game, Minceraft!
+
+Time: 1/5/17 3:18 AM
+Description: There was a severe problem during mod loading that has caused the game to fail
+
+net.minecraftforge.fml.common.LoaderExceptionModCrash: Caught exception from Tough As Nails Addons (tanaddons)
+Caused by: java.lang.NullPointerException
+	at net.minecraft.block.state.BlockStateContainer.validateProperty(BlockStateContainer.java:101)
+	at net.minecraft.block.state.BlockStateContainer.<init>(BlockStateContainer.java:75)
+	at net.minecraft.block.state.BlockStateContainer.<init>(BlockStateContainer.java:60)
+	at p455w0rd.tanaddons.blocks.BlockAC.createBlockState(BlockAC.java:216)
+	at net.minecraft.block.Block.<init>(Block.java:225)
+	at net.minecraft.block.BlockContainer.<init>(BlockContainer.java:21)
+	at net.minecraft.block.BlockContainer.<init>(BlockContainer.java:16)
+	at p455w0rd.tanaddons.blocks.BlockBase.<init>(BlockBase.java:33)
+	at p455w0rd.tanaddons.blocks.BlockAC.<init>(BlockAC.java:40)
+	at p455w0rd.tanaddons.init.ModBlocks.init(ModBlocks.java:16)
+	at p455w0rd.tanaddons.proxy.CommonProxy.preInit(CommonProxy.java:13)
+	at p455w0rd.tanaddons.proxy.ClientProxy.preInit(ClientProxy.java:13)
+	at p455w0rd.tanaddons.TANAddons.preInit(TANAddons.java:24)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraftforge.fml.common.FMLModContainer.handleModStateEvent(FMLModContainer.java:602)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.google.common.eventbus.EventSubscriber.handleEvent(EventSubscriber.java:74)
+	at com.google.common.eventbus.SynchronizedEventSubscriber.handleEvent(SynchronizedEventSubscriber.java:47)
+	at com.google.common.eventbus.EventBus.dispatch(EventBus.java:322)
+	at com.google.common.eventbus.EventBus.dispatchQueuedEvents(EventBus.java:304)
+	at com.google.common.eventbus.EventBus.post(EventBus.java:275)
+	at net.minecraftforge.fml.common.LoadController.sendEventToModContainer(LoadController.java:243)
+	at net.minecraftforge.fml.common.LoadController.propogateStateMessage(LoadController.java:221)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.google.common.eventbus.EventSubscriber.handleEvent(EventSubscriber.java:74)
+	at com.google.common.eventbus.SynchronizedEventSubscriber.handleEvent(SynchronizedEventSubscriber.java:47)
+	at com.google.common.eventbus.EventBus.dispatch(EventBus.java:322)
+	at com.google.common.eventbus.EventBus.dispatchQueuedEvents(EventBus.java:304)
+	at com.google.common.eventbus.EventBus.post(EventBus.java:275)
+	at net.minecraftforge.fml.common.LoadController.distributeStateMessage(LoadController.java:145)
+	at net.minecraftforge.fml.common.Loader.preinitializeMods(Loader.java:614)
+	at net.minecraftforge.fml.client.FMLClientHandler.beginMinecraftLoading(FMLClientHandler.java:257)
+	at net.minecraft.client.Minecraft.startGame(Minecraft.java:439)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:351)
+	at net.minecraft.client.main.Main.main(Main.java:118)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraft.launchwrapper.Launch.launch(Launch.java:135)
+	at net.minecraft.launchwrapper.Launch.main(Launch.java:28)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraftforge.gradle.GradleStartCommon.launch(GradleStartCommon.java:97)
+	at GradleStart.main(GradleStart.java:26)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- System Details --
+Details:
+	Minecraft Version: 1.10.2
+	Operating System: Windows 7 (amd64) version 6.1
+	Java Version: 1.8.0_102, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+	Memory: 568854456 bytes (542 MB) / 1438646272 bytes (1372 MB) up to 3801088000 bytes (3625 MB)
+	JVM Flags: 0 total; 
+	IntCache: cache: 0, tcache: 0, allocated: 0, tallocated: 0
+	FML: MCP 9.32 Powered by Forge 12.18.3.2185 9 mods loaded, 9 mods active
+	States: 'U' = Unloaded 'L' = Loaded 'C' = Constructed 'H' = Pre-initialized 'I' = Initialized 'J' = Post-initialized 'A' = Available 'D' = Disabled 'E' = Errored
+	UCH	mcp{9.19} [Minecraft Coder Pack] (minecraft.jar) 
+	UCH	FML{8.0.99.99} [Forge Mod Loader] (forgeSrc-1.10.2-12.18.3.2185-PROJECT(TAN-Addons).jar) 
+	UCH	Forge{12.18.3.2185} [Minecraft Forge] (forgeSrc-1.10.2-12.18.3.2185-PROJECT(TAN-Addons).jar) 
+	UCH	tesla{1.2.1.50} [TESLA] (Tesla-1.10.2-1.2.1.50.jar) 
+	UCH	p455w0rdslib{1.0.4} [p455w0rd's Library] (bin) 
+	UCH	ToughAsNails{@MOD_VERSION@} [Tough As Nails] (bin) 
+	UCE	tanaddons{1.0.0} [Tough As Nails Addons] (bin) 
+	UCH	endercore{1.10.2-0.4.1.61-beta} [EnderCore] (EnderCore-1.10.2-0.4.1.61-beta.jar) 
+	UCH	EnderIO{1.10.2-3.0.1.147_beta} [Ender IO] (EnderIO-1.10.2-3.0.1.147_beta.jar) 
+	Loaded coremods (and transformers): 
+TANLoadingPlugin (unknown)
+  toughasnails.asm.transformer.BlockCropsTransformer
+  toughasnails.asm.transformer.EntityRendererTransformer
+  toughasnails.asm.transformer.WorldTransformer
+EnderCorePlugin (EnderCore-1.10.2-0.4.1.61-beta.jar)
+  com.enderio.core.common.transform.EnderCoreTransformer
+	GL info: ' Vendor: 'ATI Technologies Inc.' Version: '4.5.13464 Compatibility Profile Context 21.19.384.0' Renderer: 'AMD Radeon (TM) R7 370 Series'
+	EnderIO: No known problems detected.
+	Detailed RF API diagnostics:
+                  * RF API class 'EnergyStorage' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/EnergyStorage.class
+                  * RF API class 'IEnergyConnection' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyConnection.class
+                  * RF API class 'IEnergyContainerItem' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyContainerItem.class
+                  * RF API class 'IEnergyHandler' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyHandler.class
+                  * RF API class 'IEnergyProvider' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyProvider.class
+                  * RF API class 'IEnergyReceiver' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyReceiver.class
+                  * RF API class 'IEnergyStorage' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyStorage.class
+                  * RF API class 'ItemEnergyContainer' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/ItemEnergyContainer.class
+                  * RF API class 'TileEnergyHandler' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/TileEnergyHandler.class
+	Detailed Tesla API diagnostics:
+                  * Tesla API class 'Tesla' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/Tesla.class
+                  * Tesla API class 'TeslaCapabilities' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/capability/TeslaCapabilities.class
+                  * Tesla API class 'ITeslaConsumer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/ITeslaConsumer.class
+                  * Tesla API class 'ITeslaHolder' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/ITeslaHolder.class
+                  * Tesla API class 'ITeslaProducer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/ITeslaProducer.class
+                  * Tesla API class 'BaseTeslaContainer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/BaseTeslaContainer.class
+                  * Tesla API class 'BaseTeslaContainerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/BaseTeslaContainerProvider.class
+                  * Tesla API class 'InfiniteTeslaConsumer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaConsumer.class
+                  * Tesla API class 'InfiniteTeslaConsumerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaConsumerProvider.class
+                  * Tesla API class 'InfiniteTeslaProducer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaProducer.class
+                  * Tesla API class 'InfiniteTeslaProducerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.50/58cb63ce869704676dd162406bebc150dc69e1a8/Tesla-1.10.2-1.2.1.50.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaProducerProvider.class

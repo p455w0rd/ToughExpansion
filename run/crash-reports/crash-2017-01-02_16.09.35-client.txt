@@ -1,0 +1,145 @@
+---- Minecraft Crash Report ----
+// You're mean.
+
+Time: 1/2/17 4:09 PM
+Description: Unexpected error
+
+java.lang.NullPointerException: Unexpected error
+	at net.minecraft.world.World.getSkyColorBody(World.java:1477)
+	at net.minecraft.world.WorldProvider.getSkyColor(WorldProvider.java:415)
+	at net.minecraft.world.World.getSkyColor(World.java:1468)
+	at net.minecraft.client.renderer.EntityRenderer.updateFogColor(EntityRenderer.java:1691)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorldPass(EntityRenderer.java:1243)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorld(EntityRenderer.java:1229)
+	at net.minecraft.client.renderer.EntityRenderer.updateCameraAndRender(EntityRenderer.java:1038)
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1076)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:371)
+	at net.minecraft.client.main.Main.main(Main.java:118)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraft.launchwrapper.Launch.launch(Launch.java:135)
+	at net.minecraft.launchwrapper.Launch.main(Launch.java:28)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraftforge.gradle.GradleStartCommon.launch(GradleStartCommon.java:97)
+	at GradleStart.main(GradleStart.java:26)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Client thread
+Stacktrace:
+	at net.minecraft.world.World.getSkyColorBody(World.java:1477)
+	at net.minecraft.world.WorldProvider.getSkyColor(WorldProvider.java:415)
+	at net.minecraft.world.World.getSkyColor(World.java:1468)
+	at net.minecraft.client.renderer.EntityRenderer.updateFogColor(EntityRenderer.java:1691)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorldPass(EntityRenderer.java:1243)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorld(EntityRenderer.java:1229)
+
+-- Affected level --
+Details:
+	Level name: MpServer
+	All players: 0 total; []
+	Chunk stats: MultiplayerChunkCache: 0, 0
+	Level seed: 0
+	Level generator: ID 00 - default, ver 1. Features enabled: false
+	Level generator options: 
+	Level spawn location: World: (8,64,8), Chunk: (at 8,4,8 in 0,0; contains blocks 0,0,0 to 15,255,15), Region: (0,0; contains chunks 0,0 to 31,31, blocks 0,0,0 to 511,255,511)
+	Level time: 0 game time, 0 day time
+	Level dimension: 0
+	Level storage version: 0x00000 - Unknown?
+	Level weather: Rain time: 0 (now: false), thunder time: 0 (now: false)
+	Level game mode: Game mode: creative (ID 1). Hardcore: false. Cheats: false
+	Forced entities: 0 total; []
+	Retry entities: 0 total; []
+	Server brand: ~~ERROR~~ NullPointerException: null
+	Server type: Integrated singleplayer server
+Stacktrace:
+	at net.minecraft.client.multiplayer.WorldClient.addWorldInfoToCrashReport(WorldClient.java:415)
+	at net.minecraft.client.Minecraft.addGraphicsAndWorldToCrashReport(Minecraft.java:2660)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:400)
+	at net.minecraft.client.main.Main.main(Main.java:118)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraft.launchwrapper.Launch.launch(Launch.java:135)
+	at net.minecraft.launchwrapper.Launch.main(Launch.java:28)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at net.minecraftforge.gradle.GradleStartCommon.launch(GradleStartCommon.java:97)
+	at GradleStart.main(GradleStart.java:26)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.10.2
+	Operating System: Windows 7 (amd64) version 6.1
+	Java Version: 1.8.0_102, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+	Memory: 966860792 bytes (922 MB) / 2123366400 bytes (2025 MB) up to 3801088000 bytes (3625 MB)
+	JVM Flags: 0 total; 
+	IntCache: cache: 0, tcache: 0, allocated: 12, tallocated: 94
+	FML: MCP 9.32 Powered by Forge 12.18.3.2185 12 mods loaded, 12 mods active
+	States: 'U' = Unloaded 'L' = Loaded 'C' = Constructed 'H' = Pre-initialized 'I' = Initialized 'J' = Post-initialized 'A' = Available 'D' = Disabled 'E' = Errored
+	UCHIJAAAA	mcp{9.19} [Minecraft Coder Pack] (minecraft.jar) 
+	UCHIJAAAA	FML{8.0.99.99} [Forge Mod Loader] (forgeSrc-1.10.2-12.18.3.2185-PROJECT(TAN-Addons).jar) 
+	UCHIJAAAA	Forge{12.18.3.2185} [Minecraft Forge] (forgeSrc-1.10.2-12.18.3.2185-PROJECT(TAN-Addons).jar) 
+	UCHIJAAAA	tesla{1.2.1.49} [TESLA] (Tesla-1.10.2-1.2.1.49.jar) 
+	UCHIJAAAA	p455w0rdslib{1.0.3} [p455w0rd's Library] (bin) 
+	UCHIJAAAA	ToughAsNails{@MOD_VERSION@} [Tough As Nails] (bin) 
+	UCHIJAAAA	tanaddons{1.0.0} [Tough As Nails Addons] (bin) 
+	UCHIJAAAA	Waila{1.7.0} [Waila] (Waila-1.7.0-B3_1.9.4.jar) 
+	UCHIJAAAA	JEI{3.13.3.382} [Just Enough Items] (jei_1.10.2-3.13.3.382.jar) 
+	UCHIJAAAA	endercore{@VERSION@} [EnderCore] (bin) 
+	UCHIJAAAA	EnderIO{@VERSION@} [Ender IO] (bin) 
+	UCHIJAAAA	theoneprobe{1.0.11} [The One Probe] (TheOneProbe-1.9.4-1.0.11-24.jar) 
+	Loaded coremods (and transformers): 
+	GL info: ' Vendor: 'ATI Technologies Inc.' Version: '4.5.13464 Compatibility Profile Context 21.19.384.0' Renderer: 'AMD Radeon (TM) R7 370 Series'
+	EnderIO: No known problems detected.
+	Detailed RF API diagnostics:
+                  * RF API class 'EnergyStorage' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/EnergyStorage.class
+                  * RF API class 'IEnergyConnection' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyConnection.class
+                  * RF API class 'IEnergyContainerItem' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyContainerItem.class
+                  * RF API class 'IEnergyHandler' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyHandler.class
+                  * RF API class 'IEnergyProvider' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyProvider.class
+                  * RF API class 'IEnergyReceiver' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyReceiver.class
+                  * RF API class 'IEnergyStorage' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/IEnergyStorage.class
+                  * RF API class 'ItemEnergyContainer' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/ItemEnergyContainer.class
+                  * RF API class 'TileEnergyHandler' is loaded from: file:/C:/mc_modding/p455w0rdLib/1.10.2/bin/cofh/api/energy/TileEnergyHandler.class
+	Detailed Tesla API diagnostics:
+                  * Tesla API class 'Tesla' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/Tesla.class
+                  * Tesla API class 'TeslaCapabilities' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/capability/TeslaCapabilities.class
+                  * Tesla API class 'ITeslaConsumer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/ITeslaConsumer.class
+                  * Tesla API class 'ITeslaHolder' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/ITeslaHolder.class
+                  * Tesla API class 'ITeslaProducer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/ITeslaProducer.class
+                  * Tesla API class 'BaseTeslaContainer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/BaseTeslaContainer.class
+                  * Tesla API class 'BaseTeslaContainerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/BaseTeslaContainerProvider.class
+                  * Tesla API class 'InfiniteTeslaConsumer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaConsumer.class
+                  * Tesla API class 'InfiniteTeslaConsumerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaConsumerProvider.class
+                  * Tesla API class 'InfiniteTeslaProducer' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaProducer.class
+                  * Tesla API class 'InfiniteTeslaProducerProvider' is loaded from: jar:file:/C:/Users/p455w0rd/.gradle/caches/modules-2/files-2.1/net.darkhax.tesla/Tesla/1.10.2-1.2.1.49/ea50f4fcc8fd54e42529e262751bbd80d13f6fa8/Tesla-1.10.2-1.2.1.49.jar!/net/darkhax/tesla/api/implementation/InfiniteTeslaProducerProvider.class
+
+	Launched Version: 1.10.2
+	LWJGL: 2.9.4
+	OpenGL: AMD Radeon (TM) R7 370 Series GL version 4.5.13464 Compatibility Profile Context 21.19.384.0, ATI Technologies Inc.
+	GL Caps: Using GL 1.3 multitexturing.
+Using GL 1.3 texture combiners.
+Using framebuffer objects because OpenGL 3.0 is supported and separate blending is supported.
+Shaders are available because OpenGL 2.1 is supported.
+VBOs are available because OpenGL 1.5 is supported.
+
+	Using VBOs: Yes
+	Is Modded: Definitely; Client brand changed to 'fml,forge'
+	Type: Client (map_client.txt)
+	Resource Packs: 
+	Current Language: English (US)
+	Profiler Position: N/A (disabled)
+	CPU: 8x Intel(R) Core(TM) i7-4790K CPU @ 4.00GHz
