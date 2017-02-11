@@ -63,7 +63,9 @@ public class BlockTempRegulator extends BlockBase {
 				else {
 
 					String[] msg = {
-							"message.tanaddons.noredstonerequired", "message.tanaddons.redstoneignored", "message.tanaddons.redstonerequired"
+							"message.tanaddons.noredstonerequired",
+							"message.tanaddons.redstoneignored",
+							"message.tanaddons.redstonerequired"
 					};
 					player.addChatMessage(new TextComponentString(I18n.format(msg[getTE(world, pos).getMode()])));
 					return true;
@@ -150,13 +152,13 @@ public class BlockTempRegulator extends BlockBase {
 			}
 			return null;
 		}
-
+	
 		@Override
 		public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
 			ItemStack itemstack = getTileDataItemStack(worldIn, pos, state);
 			return itemstack != null ? itemstack : new ItemStack(this);
 		}
-
+	
 		@Override
 		public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 			return Lists.newArrayList(getItem((World) world, pos, state));

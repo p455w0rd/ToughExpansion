@@ -1,13 +1,12 @@
 {
     "forge_marker": 1,
     "defaults": {
-        "model": "tanaddons:orientable",
+        "model": "tanaddons:no_orientation",
 		"textures": {
-			"particle": "tanaddons:blocks/furnace_side",
+			"particle": "tanaddons:blocks/temp_regulator_side",
 			"top": "tanaddons:blocks/furnace_top",
 			"bottom": "tanaddons:blocks/furnace_bottom",
-			"front": "tanaddons:blocks/ac_front_on",
-			"side": "tanaddons:blocks/furnace_side"
+			"side": "tanaddons:blocks/temp_regulator_side"
 		},
         "transform": "forge:default-block"
     },
@@ -17,27 +16,13 @@
 		"active": {
 			"true": {
 				"textures": {
-					"front": "tanaddons:blocks/ac_front_on"
+					"side": "tanaddons:blocks/temp_regulator_side"
 				}
 			},
 			"false": {
 				"textures": {
-					"front": "tanaddons:blocks/ac_front_off"
+					"side": "tanaddons:blocks/temp_regulator_side_off"
 				}
-			}
-		},
-		"facing": {
-			"north": {
-				"y": 0
-			},
-			"east": {
-				"y": 90
-			},
-			"south": {
-				"y": 180
-			},
-			"west": {
-				"y": 270
 			}
 		}
 	}

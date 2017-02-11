@@ -1,5 +1,5 @@
-tile.ac.name=Air Conditioning Unit
-tile.heater.name=Heating Unit
+tile.ac.name=Temperature Regulator
+tile.heater.name=Temperature Regulator
 tile.temp_regulator.name=Temperature Regulator
 
 item.portable_temp_regulator.name=Portable Temperature Regulator
@@ -7,7 +7,7 @@ item.thirst_quencher.name=Thirst Quencher
 
 name.TRINKET=Baubles Trinket
 
-itemGroup.tanaddons=Tough As Nails Addons
+itemGroup.tanaddons=Tough As Nails Exapansion
 
 tooltip.tanaddons.thirstquencher.desc=Right-click on a water source block or tank with water to fill
 tooltip.tanaddons.thirstquencher.desc2=Requires water and RF to run.
