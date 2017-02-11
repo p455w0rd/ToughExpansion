@@ -7,7 +7,7 @@ item.thirst_quencher.name=Thirst Quencher
 
 name.TRINKET=Baubles Trinket
 
-itemGroup.tanaddons=Tough As Nails Exapansion
+itemGroup.tanaddons=Tough Expansion
 
 tooltip.tanaddons.thirstquencher.desc=Right-click on a water source block or tank with water to fill
 tooltip.tanaddons.thirstquencher.desc2=Requires water and RF to run.
