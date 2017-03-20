@@ -17,7 +17,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 group = "p455w0rd.tanaddons"
 version = "1.10.2-" + getVersion("VERSION")
-archivesBaseName = "ToughAsNails-Expansion"
+archivesBaseName = "ToughExpansion"
 
 minecraft {
     version = "1.10.2-12.18.3.2185"

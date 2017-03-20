@@ -19,12 +19,12 @@ public class ModCreativeTab extends CreativeTabs {
 
 	@Override
 	public ItemStack getIconItemStack() {
-		return new ItemStack(ModBlocks.AC);
+		return new ItemStack(ModBlocks.TEMP_REGULATOR);
 		//return new ItemStack(ModItems.dankNullItem, 1, 5);
 	}
 
 	@Override
 	public Item getTabIconItem() {
-		return new ItemStack(ModBlocks.AC).getItem();
+		return new ItemStack(ModBlocks.TEMP_REGULATOR).getItem();
 	}
 }

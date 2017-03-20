@@ -50,9 +50,9 @@ import p455w0rd.tanaddons.init.ModCreativeTab;
 import p455w0rd.tanaddons.init.ModGlobals;
 import p455w0rdslib.util.ReadableNumberConverter;
 import toughasnails.api.TANPotions;
+import toughasnails.api.config.GameplayOption;
+import toughasnails.api.config.SyncedConfig;
 import toughasnails.api.thirst.ThirstHelper;
-import toughasnails.config.GameplayOption;
-import toughasnails.config.SyncedConfigHandler;
 import toughasnails.thirst.ThirstHandler;
 
 /**
@@ -95,7 +95,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	}
 
 	private void doTick(Entity entity, ItemStack stack) {
-		if (entity instanceof EntityPlayer && SyncedConfigHandler.getBooleanValue(GameplayOption.ENABLE_THIRST)) {
+		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST)) {
 			if (getEnergyStored(stack) < 100 || getFluidStored(stack) < 100) {
 				return;
 			}

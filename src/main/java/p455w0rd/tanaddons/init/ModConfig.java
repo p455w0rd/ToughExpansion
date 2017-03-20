@@ -45,7 +45,7 @@ public class ModConfig {
 		public static int TEMP_REGULATOR_RF_CAPACITY = 1600000;
 		public static boolean THIRST_HEALTH_REGEN_FIX = true;
 		public static int THIRST_QUENCHER_RF_CAPACITY = 400000;
-		public static int PORTABLE_TEMP_REGULATOR_CAPACITY = 400000;
+		public static int PORTABLE_TEMP_REGULATOR_CAPACITY = 1600000;
 
 	}
 

@@ -1,6 +1,6 @@
 [{
     "modid": "tanaddons",
-    "name": "Tough As Nails Expansion",
+    "name": "Tough Expansion",
     "description": "Adds RF-based items and blocks for use with the Tough As Nails mod",
     "version": "${version}",
     "mcversion": "1.10.2",
