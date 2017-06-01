@@ -30,6 +30,7 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -80,7 +81,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	}
 
 	@Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		ItemStack item = new ItemStack(this);
 		ItemStack item2 = new ItemStack(this);
 		ItemStack item3 = new ItemStack(this);
@@ -132,7 +133,11 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack stack = playerIn.getHeldItemMainhand();
+		if (stack == null) {
+			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+		}
 		init(stack);
 		if (getFluidStored(stack) >= CAPACITY) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
@@ -229,7 +234,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		tooltip.add("Stored Water: " + getFluidStored(stack) / 1000 + "/" + CAPACITY / 1000 + " Buckets");
+		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + CAPACITY + " mB");
 		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
 		if (player.isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
 			tooltip.add("");

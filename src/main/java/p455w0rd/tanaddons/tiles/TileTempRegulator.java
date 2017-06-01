@@ -39,9 +39,9 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	private int INPUT = 10000;
 	private int ENERGY_USE = 100;
 	private int ENERGY = 0;
-	private final String TAG_ENERGY = "Energy";
+	public static final String TAG_ENERGY = "Energy";
 	private int REDSTONE_MODE = 0; //0 = requires redstone, 1 = 0 redstone signal required, 2 = redstone ignored
-	private final String TAG_MODE = "RSMode";
+	public static final String TAG_MODE = "RSMode";
 	private final String TAG_TIMERLIST = "TimerList";
 	private final String TAG_TIMERLISTENTRY_PLAYERID = "PlayerID";
 	private final String TAG_TIMERLISTENTRY_TIME = "Time";
@@ -70,9 +70,9 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		switch (REDSTONE_MODE) {
 		case 0:
 		default:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) > 0 || worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 1:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) == 0 && !worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) == 0 && !world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 2:
 			return getEnergyStored() > ENERGY_USE;
 		}
