@@ -19,7 +19,7 @@ public class ModRecipes {
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.HEATER), new Object[] {
 				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(Items.BLAZE_ROD), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
 		}));
-		
+
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.AC), new Object[] {
 				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(TANItems.freeze_rod), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
 		}));
@@ -65,7 +65,7 @@ public class ModRecipes {
 				Character.valueOf('c'),
 				new ItemStack(TANItems.canteen),
 				Character.valueOf('d'),
-				new ItemStack(Items.POTIONITEM)
+				new ItemStack(TANItems.fruit_juice, 1, 6)
 		}));
 
 	}
