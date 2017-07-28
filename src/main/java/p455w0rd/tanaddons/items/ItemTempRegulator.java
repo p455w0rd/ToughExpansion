@@ -58,67 +58,64 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 		}
 		NBTTagCompound nbt = stack.getTagCompound();
 		if (!nbt.hasKey(TAG_TIME)) {
-			nbt.setLong(TAG_TIME, -1L);
+			nbt.setInteger(TAG_TIME, 100);
 		}
 	}
 
 	private void doTick(Entity entity, ItemStack stack) {
 		init(stack);
+		int energy = Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
 		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(TemperatureOption.ENABLE_TEMPERATURE)) {
-			if (getEnergyStored(stack) < 100) {
+			if (getEnergyStored(stack) < energy) {
 				return;
 			}
 
 			EntityPlayer player = (EntityPlayer) entity;
 			TemperatureHandler tempHandler = (TemperatureHandler) TemperatureHelper.getTemperatureData(player);
-			//float temp = (float) MathUtils.clamp(tempHandler.debugger.targetTemperature, 0, TemperatureScale.getScaleTotal()) / (float) TemperatureScale.getScaleTotal();
 			ITemperature data = TemperatureHelper.getTemperatureData(player);
 			Temperature playerTemp = data.getTemperature();
 			int currentTemp = playerTemp.getRawValue();
+			int currentTime = getTime(stack);
 			if (currentTemp != 14) {
-				if (getTime(stack) != -1L) {
-					long startTime = getTime(stack);
-					if (ModGlobals.TIMER >= startTime + 1000L) {
-						//tempHandler.setChangeTime(0);
-						player.removePotionEffect(TANPotions.hypothermia);
-						player.removePotionEffect(TANPotions.hyperthermia);
-						if (currentTemp < 14) {
-							tempHandler.setTemperature(new Temperature(currentTemp + 1));
-						}
-						else if (currentTemp > 14) {
-							tempHandler.setTemperature(new Temperature(currentTemp - 1));
-						}
-						setTime(stack, -1L);
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+				if (currentTime <= 0) {
+					tempHandler.setChangeTime(1);
+					player.removePotionEffect(TANPotions.hypothermia);
+					player.removePotionEffect(TANPotions.hyperthermia);
+					if (currentTemp < 14) {
+						tempHandler.setTemperature(new Temperature(currentTemp + 1));
 					}
-					else {
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+					else if (currentTemp > 14) {
+						tempHandler.setTemperature(new Temperature(currentTemp - 1));
 					}
+					setTime(stack, 100);
+					setEnergyStored(stack, getEnergyStored(stack) - energy);
 				}
 				else {
-					setTime(stack, ModGlobals.TIMER);
-					setEnergyStored(stack, getEnergyStored(stack) - 100);
+					setTime(stack, currentTime - 1);
+					setEnergyStored(stack, getEnergyStored(stack) - energy);
 				}
 			}
 			else {
-				setTime(stack, -1L);
+				if (getTime(stack) != 100) {
+					setTime(stack, 100);
+				}
 			}
 		}
 	}
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) != -1L && getEnergyStored(stack) > 0;
+		return getTime(stack) < 100 && getEnergyStored(stack) > Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
 	}
 
-	private long getTime(ItemStack stack) {
+	private int getTime(ItemStack stack) {
 		init(stack);
-		return stack.getTagCompound().getLong(TAG_TIME);
+		return stack.getTagCompound().getInteger(TAG_TIME);
 	}
 
-	private void setTime(ItemStack stack, long amount) {
+	private void setTime(ItemStack stack, int amount) {
 		init(stack);
-		stack.getTagCompound().setLong(TAG_TIME, amount);
+		stack.getTagCompound().setInteger(TAG_TIME, amount);
 	}
 
 	@Override

@@ -20,8 +20,8 @@ version = "1.11.2-" + getVersion("VERSION")
 archivesBaseName = "ToughExpansion"
 
 minecraft {
-    version = "1.11.2-13.20.0.2310"
-	mappings = "snapshot_nodoc_20170530"
+    version = "1.11.2-13.20.0.2315"
+	mappings = "snapshot_nodoc_20170626"
 	runDir = "run"
 }
 

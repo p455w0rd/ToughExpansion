@@ -103,41 +103,46 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			EntityPlayer player = (EntityPlayer) entity;
 			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(player);
 			int currentThirst = thirstHandler.getThirst();
+			int currentTime = getTime(stack);
 			if (currentThirst < 20) {
-				if (getTime(stack) != -1L) {
-					long startTime = getTime(stack);
-					if (ModGlobals.TIMER >= startTime + 1000L) {
-						player.removePotionEffect(TANPotions.thirst);
-						if (currentThirst < 20) {
-							thirstHandler.setThirst(currentThirst + 1);
-							thirstHandler.setHydration(5.0F);
-							thirstHandler.setExhaustion(0.0F);
-						}
-						drainFluid(stack, 100);
-						setTime(stack, -1L);
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+				if (currentTime <= 0) {
+					player.removePotionEffect(TANPotions.thirst);
+					if (currentThirst < 20) {
+						thirstHandler.setThirst(currentThirst + 1);
+						thirstHandler.setHydration(5.0F);
+						thirstHandler.setExhaustion(0.0F);
 					}
-					else {
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
-					}
+					drainFluid(stack, 100);
+					setTime(stack, 50);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 				else {
-					setTime(stack, ModGlobals.TIMER);
-					setEnergyStored(stack, getEnergyStored(stack) - 100);
+					setTime(stack, currentTime - 1);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 			}
 			else {
-				setTime(stack, -1L);
+				if (getTime(stack) != 50) {
+					setTime(stack, 50);
+				}
 			}
 		}
 	}
 
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+
 		ItemStack stack = playerIn.getHeldItemMainhand();
 		if (stack == null) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 		}
+		/*
+		if (playerIn.isSneaking()) {
+			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(playerIn);
+			thirstHandler.setThirst(0);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		}
+		*/
 		init(stack);
 		if (getFluidStored(stack) >= CAPACITY) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
@@ -201,15 +206,15 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) != -1L && getEnergyStored(stack) > 0;
+		return getTime(stack) < 50 && getEnergyStored(stack) > 10;
 	}
 
-	private long getTime(ItemStack stack) {
+	private int getTime(ItemStack stack) {
 		init(stack);
-		return stack.getTagCompound().getLong(TAG_TIME);
+		return stack.getTagCompound().getInteger(TAG_TIME);
 	}
 
-	private void setTime(ItemStack stack, long amount) {
+	private void setTime(ItemStack stack, int amount) {
 		init(stack);
 		stack.getTagCompound().setLong(TAG_TIME, amount);
 	}
