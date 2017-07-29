@@ -1,12 +1,10 @@
 package p455w0rd.tanaddons.items;
 
-import java.util.List;
-
-import cofh.api.energy.IEnergyContainerItem;
+import cofh.redstoneflux.api.IEnergyContainerItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 
 /**
  * @author p455w0rd
@@ -47,7 +45,7 @@ public class ItemRF extends ItemBase implements IEnergyContainerItem {
 	}
 
 	@Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		subItems.add(new ItemStack(this));
 		ItemStack item = new ItemStack(this);
 		setFull(item);

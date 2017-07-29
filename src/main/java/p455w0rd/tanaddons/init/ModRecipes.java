@@ -1,10 +1,15 @@
 package p455w0rd.tanaddons.init;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import p455w0rdslib.util.RecipeUtils;
 import toughasnails.api.TANBlocks;
 import toughasnails.api.item.TANItems;
 
@@ -14,17 +19,30 @@ import toughasnails.api.item.TANItems;
  */
 public class ModRecipes {
 
+	private static final ModRecipes INSTANCE = new ModRecipes();
+	private static boolean init = true;
+
+	public static final List<IRecipe> CRAFTING_RECIPES = Lists.<IRecipe>newLinkedList();
+
+	public IRecipe tempRegulator;
+	public IRecipe portableTempRegulator;
+	public IRecipe thirstQuencher;
+
+	public static ModRecipes getInstance() {
+		return INSTANCE;
+	}
+
 	public static void init() {
-		/*
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.HEATER), new Object[] {
-				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(Items.BLAZE_ROD), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
-		}));
-		
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.AC), new Object[] {
-				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(TANItems.freeze_rod), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
-		}));
-		*/
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.TEMP_REGULATOR), new Object[] {
+		if (init) {
+			getInstance().addRecipes();
+			init = false;
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public void addRecipes() {
+
+		CRAFTING_RECIPES.add(tempRegulator = RecipeUtils.addOldShaped(new ItemStack(ModBlocks.TEMP_REGULATOR), new Object[] {
 				"aaa",
 				"bcd",
 				"eee",
@@ -40,7 +58,7 @@ public class ModRecipes {
 				new ItemStack(TANItems.freeze_rod)
 		}));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.TEMP_REGULATOR), new Object[] {
+		CRAFTING_RECIPES.add(portableTempRegulator = RecipeUtils.addOldShaped(new ItemStack(ModItems.TEMP_REGULATOR), new Object[] {
 				"aba",
 				"aca",
 				"ada",
@@ -54,7 +72,7 @@ public class ModRecipes {
 				new ItemStack(TANBlocks.temperature_coil, 1, 1)
 		}));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
+		CRAFTING_RECIPES.add(thirstQuencher = RecipeUtils.addOldShaped(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
 				"aba",
 				"aca",
 				"ada",
@@ -65,8 +83,12 @@ public class ModRecipes {
 				Character.valueOf('c'),
 				new ItemStack(TANItems.canteen),
 				Character.valueOf('d'),
-				new ItemStack(Items.POTIONITEM)
+				new ItemStack(TANItems.fruit_juice, 1, 6)
 		}));
+
+		for (IRecipe recipe : CRAFTING_RECIPES) {
+			ForgeRegistries.RECIPES.register(recipe);
+		}
 
 	}
 

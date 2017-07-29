@@ -9,20 +9,37 @@ buildscript {
         }
     }
 	dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 group = "p455w0rd.tanaddons"
-version = "1.10.2-" + getVersion("VERSION")
+version = "1.12-" + getVersion("VERSION")
 archivesBaseName = "ToughExpansion"
 
 minecraft {
-    version = "1.10.2-12.18.3.2185"
-	mappings = "snapshot_nodoc_20160519"
+    version = "1.12-14.21.1.2407"
+	mappings = "stable_nodoc_31"
 	runDir = "run"
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		name = "progwml6"
+		url = "http://dvs1.progwml6.com/files/maven"
+	}
+	maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
+    }
+}
+
+dependencies {
+	deobfCompile "mezz.jei:jei_1.12:+"
+	deobfCompile "cofh:RedstoneFlux:1.12-2.0.0.1:universal"
 }
 
 processResources {

@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Maps;
 
-import cofh.api.energy.IEnergyReceiver;
-import cofh.api.energy.IEnergyStorage;
+import cofh.redstoneflux.api.IEnergyReceiver;
+import cofh.redstoneflux.api.IEnergyStorage;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,7 +23,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import p455w0rd.tanaddons.init.ModConfig.Options;
-import p455w0rd.tanaddons.init.ModGlobals;
 import toughasnails.api.TANPotions;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.temperature.Temperature;
@@ -39,13 +38,13 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	private int INPUT = 10000;
 	private int ENERGY_USE = 100;
 	private int ENERGY = 0;
-	private final String TAG_ENERGY = "Energy";
-	private int REDSTONE_MODE = 0; //0 = requires redstone, 1 = 0 redstone signal required, 2 = redstone ignored
-	private final String TAG_MODE = "RSMode";
+	public static final String TAG_ENERGY = "Energy";
+	private int REDSTONE_MODE = 0; //0 = requires redstone, 1 = requires lack of signal, 2 = redstone ignored
+	public static final String TAG_MODE = "RSMode";
 	private final String TAG_TIMERLIST = "TimerList";
 	private final String TAG_TIMERLISTENTRY_PLAYERID = "PlayerID";
 	private final String TAG_TIMERLISTENTRY_TIME = "Time";
-	private Map<EntityPlayer, Long> PLAYER_TIMERS = Maps.newHashMap();
+	private Map<EntityPlayer, Integer> PLAYER_TIMERS = Maps.newHashMap();
 
 	public TileTempRegulator() {
 
@@ -70,9 +69,9 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		switch (REDSTONE_MODE) {
 		case 0:
 		default:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) > 0 || worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 1:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) == 0 && !worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) == 0 && !world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 2:
 			return getEnergyStored() > ENERGY_USE;
 		}
@@ -158,11 +157,14 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		}
 		if (compound.hasKey(TAG_TIMERLIST) && compound.getTagList(TAG_TIMERLIST, 10).tagCount() > 0) {
 			NBTTagList tagList = compound.getTagList(TAG_TIMERLIST, 10);
-			Map<EntityPlayer, Long> newList = Maps.newHashMap();
+			Map<EntityPlayer, Integer> newList = Maps.newHashMap();
 			for (int i = 0; i < tagList.tagCount(); i++) {
 				NBTTagCompound entry = tagList.getCompoundTagAt(i);
+				if (entry == null || getWorld() == null || entry.getString(TAG_TIMERLISTENTRY_PLAYERID) == null) {
+					continue;
+				}
 				EntityPlayer player = getWorld().getPlayerEntityByUUID(UUID.fromString(entry.getString(TAG_TIMERLISTENTRY_PLAYERID)));
-				newList.put(player, entry.getLong(TAG_TIMERLISTENTRY_TIME));
+				newList.put(player, entry.getInteger(TAG_TIMERLISTENTRY_TIME));
 			}
 			PLAYER_TIMERS = newList;
 		}
@@ -205,27 +207,22 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 				ITemperature data = TemperatureHelper.getTemperatureData(player);
 				Temperature playerTemp = data.getTemperature();
 				int currentTemp = playerTemp.getRawValue();
+				int currentTime = getTime(player);
 				if (currentTemp != 14) {
-					if (getTime(player) != -1L) {
-						long startTime = getTime(player);
-						if (ModGlobals.TIMER >= startTime + 1000L) {
-							player.removePotionEffect(TANPotions.hypothermia);
-							player.removePotionEffect(TANPotions.hyperthermia);
-							if (currentTemp < 14) {
-								tempHandler.setTemperature(new Temperature(currentTemp + 1));
-							}
-							else if (currentTemp > 14) {
-								tempHandler.setTemperature(new Temperature(currentTemp - 1));
-							}
-							setTime(player, -1L);
-							setEnergyStored(getEnergyStored() - ENERGY_USE);
+					if (getTime(player) <= 0) {
+						player.removePotionEffect(TANPotions.hypothermia);
+						player.removePotionEffect(TANPotions.hyperthermia);
+						if (currentTemp < 14) {
+							tempHandler.setTemperature(new Temperature(currentTemp + 1));
 						}
-						else {
-							setEnergyStored(getEnergyStored() - ENERGY_USE);
+						else if (currentTemp > 14) {
+							tempHandler.setTemperature(new Temperature(currentTemp - 1));
 						}
+						setTime(player, 100);
+						setEnergyStored(getEnergyStored() - ENERGY_USE);
 					}
 					else {
-						setTime(player, ModGlobals.TIMER);
+						setTime(player, currentTime - 1);
 						setEnergyStored(getEnergyStored() - ENERGY_USE);
 					}
 				}
@@ -237,11 +234,11 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 
 	}
 
-	private long getTime(EntityPlayer player) {
+	private int getTime(EntityPlayer player) {
 		if (PLAYER_TIMERS.containsKey(player)) {
 			return PLAYER_TIMERS.get(player);
 		}
-		return -1L;
+		return -1;
 	}
 
 	private void removePlayerTimer(EntityPlayer player) {
@@ -250,12 +247,12 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		}
 	}
 
-	private void setTime(EntityPlayer player, long time) {
+	private void setTime(EntityPlayer player, int time) {
 		if (!PLAYER_TIMERS.containsKey(player)) {
 			PLAYER_TIMERS.put(player, time);
 		}
 		else {
-			long currentTimeCached = PLAYER_TIMERS.get(player);
+			int currentTimeCached = PLAYER_TIMERS.get(player);
 			PLAYER_TIMERS.replace(player, currentTimeCached, time);
 		}
 	}

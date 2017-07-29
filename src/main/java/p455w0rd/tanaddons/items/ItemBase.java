@@ -3,7 +3,7 @@ package p455w0rd.tanaddons.items;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -19,7 +19,7 @@ public class ItemBase extends Item {
 		this.name = name;
 		setRegistryName(this.name);
 		setUnlocalizedName(this.name);
-		GameRegistry.register(this);
+		ForgeRegistries.ITEMS.register(this);
 		setMaxStackSize(64);
 		setMaxDamage(0);
 	}

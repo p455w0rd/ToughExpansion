@@ -4,6 +4,8 @@ import static p455w0rd.tanaddons.init.ModGlobals.MODID_BAUBLES;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Keyboard;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -16,20 +18,20 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -48,6 +50,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.tanaddons.init.ModConfig.Options;
 import p455w0rd.tanaddons.init.ModCreativeTab;
 import p455w0rd.tanaddons.init.ModGlobals;
+import p455w0rdslib.util.EasyMappings;
 import p455w0rdslib.util.ReadableNumberConverter;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.GameplayOption;
@@ -71,16 +74,11 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	public ItemThirstQuencher() {
 		super(Options.THIRST_QUENCHER_RF_CAPACITY, Options.THIRST_QUENCHER_RF_CAPACITY, 40, NAME);
 		setCreativeTab(ModCreativeTab.TAB);
-		addPropertyOverride(new ResourceLocation("filllevel"), new IItemPropertyGetter() {
-			@Override
-			public float apply(ItemStack stack, World world, EntityLivingBase entity) {
-				return (getFluidStored(stack) / 1000) / 2;
-			}
-		});
+		addPropertyOverride(new ResourceLocation("filllevel"), (stack, world, entity) -> (getFluidStored(stack) / 1000) / 2);
 	}
 
 	@Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		ItemStack item = new ItemStack(this);
 		ItemStack item2 = new ItemStack(this);
 		ItemStack item3 = new ItemStack(this);
@@ -102,37 +100,46 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			EntityPlayer player = (EntityPlayer) entity;
 			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(player);
 			int currentThirst = thirstHandler.getThirst();
+			int currentTime = getTime(stack);
 			if (currentThirst < 20) {
-				if (getTime(stack) != -1L) {
-					long startTime = getTime(stack);
-					if (ModGlobals.TIMER >= startTime + 1000L) {
-						player.removePotionEffect(TANPotions.thirst);
-						if (currentThirst < 20) {
-							thirstHandler.setThirst(currentThirst + 1);
-							thirstHandler.setHydration(5.0F);
-							thirstHandler.setExhaustion(0.0F);
-						}
-						drainFluid(stack, 100);
-						setTime(stack, -1L);
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+				if (currentTime <= 0) {
+					player.removePotionEffect(TANPotions.thirst);
+					if (currentThirst < 20) {
+						thirstHandler.setThirst(currentThirst + 1);
+						thirstHandler.setHydration(5.0F);
+						thirstHandler.setExhaustion(0.0F);
 					}
-					else {
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
-					}
+					drainFluid(stack, 100);
+					setTime(stack, 50);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 				else {
-					setTime(stack, ModGlobals.TIMER);
-					setEnergyStored(stack, getEnergyStored(stack) - 100);
+					setTime(stack, currentTime - 1);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 			}
 			else {
-				setTime(stack, -1L);
+				if (getTime(stack) != 50) {
+					setTime(stack, 50);
+				}
 			}
 		}
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+
+		ItemStack stack = playerIn.getHeldItemMainhand();
+		if (stack == null) {
+			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+		}
+
+		if (playerIn.isSneaking()) {
+			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(playerIn);
+			thirstHandler.setThirst(0);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+		}
+
 		init(stack);
 		if (getFluidStored(stack) >= CAPACITY) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
@@ -196,15 +203,15 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) != -1L && getEnergyStored(stack) > 0;
+		return getTime(stack) < 50 && getEnergyStored(stack) > 10;
 	}
 
-	private long getTime(ItemStack stack) {
+	private int getTime(ItemStack stack) {
 		init(stack);
-		return stack.getTagCompound().getLong(TAG_TIME);
+		return stack.getTagCompound().getInteger(TAG_TIME);
 	}
 
-	private void setTime(ItemStack stack, long amount) {
+	private void setTime(ItemStack stack, int amount) {
 		init(stack);
 		stack.getTagCompound().setLong(TAG_TIME, amount);
 	}
@@ -227,11 +234,11 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		tooltip.add("Stored Water: " + getFluidStored(stack) / 1000 + "/" + CAPACITY / 1000 + " Buckets");
+		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + CAPACITY + " mB");
 		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
-		if (player.isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
+		if (EasyMappings.player() != null && EasyMappings.player().isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
 			tooltip.add("");
 			tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));
 			tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc2"));

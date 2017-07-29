@@ -9,7 +9,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.tanaddons.init.ModConfig.Options;
@@ -48,14 +47,6 @@ public class ModEvents {
 			if (currentThirst < 19) {
 				e.setCanceled(true);
 			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onTick(TickEvent e) {
-		ModGlobals.TIMER++;
-		if (ModGlobals.TIMER == Long.MAX_VALUE) {
-			ModGlobals.TIMER = 0L;
 		}
 	}
 

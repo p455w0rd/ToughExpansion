@@ -1,7 +1,6 @@
 package p455w0rd.tanaddons.init;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -14,17 +13,15 @@ public class ModCreativeTab extends CreativeTabs {
 
 	public ModCreativeTab() {
 		super(ModGlobals.MODID);
-		//setBackgroundImageName(ModGlobals.MODID + ".png");
 	}
 
 	@Override
 	public ItemStack getIconItemStack() {
 		return new ItemStack(ModBlocks.TEMP_REGULATOR);
-		//return new ItemStack(ModItems.dankNullItem, 1, 5);
 	}
 
 	@Override
-	public Item getTabIconItem() {
-		return new ItemStack(ModBlocks.TEMP_REGULATOR).getItem();
+	public ItemStack getTabIconItem() {
+		return new ItemStack(ModBlocks.TEMP_REGULATOR);
 	}
 }
