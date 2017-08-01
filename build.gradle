@@ -21,7 +21,7 @@ archivesBaseName = "ToughExpansion"
 
 minecraft {
     version = "1.12-14.21.1.2407"
-	mappings = "stable_nodoc_31"
+	mappings = "snapshot_20170624"
 	runDir = "run"
 }
 

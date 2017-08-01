@@ -46,10 +46,12 @@ public class ItemRF extends ItemBase implements IEnergyContainerItem {
 
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		subItems.add(new ItemStack(this));
-		ItemStack item = new ItemStack(this);
-		setFull(item);
-		subItems.add(item);
+		if (isInCreativeTab(tab)) {
+			subItems.add(new ItemStack(this));
+			ItemStack item = new ItemStack(this);
+			setFull(item);
+			subItems.add(item);
+		}
 	}
 
 	public ItemRF setCapacity(int capacity) {

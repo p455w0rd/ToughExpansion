@@ -79,17 +79,19 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		ItemStack item = new ItemStack(this);
-		ItemStack item2 = new ItemStack(this);
-		ItemStack item3 = new ItemStack(this);
-		setFull(item);
-		addFluid(item2, CAPACITY);
-		addFluid(item3, CAPACITY);
-		setFull(item3);
-		subItems.add(new ItemStack(this)); // 0 RF - 0 Fluid
-		subItems.add(item); // full RF - 0 fluid
-		subItems.add(item2); // 0 RF - full fluid
-		subItems.add(item3); // full RF - full fluid
+		if (isInCreativeTab(tab)) {
+			ItemStack item = new ItemStack(this);
+			ItemStack item2 = new ItemStack(this);
+			ItemStack item3 = new ItemStack(this);
+			setFull(item);
+			addFluid(item2, CAPACITY);
+			addFluid(item3, CAPACITY);
+			setFull(item3);
+			subItems.add(new ItemStack(this)); // 0 RF - 0 Fluid
+			subItems.add(item); // full RF - 0 fluid
+			subItems.add(item2); // 0 RF - full fluid
+			subItems.add(item3); // full RF - full fluid
+		}
 	}
 
 	private void doTick(Entity entity, ItemStack stack) {
@@ -130,7 +132,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
 
 		ItemStack stack = playerIn.getHeldItemMainhand();
-		if (stack == null) {
+		if (stack.isEmpty()) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 		}
 
@@ -183,7 +185,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			nbt.setInteger(TAG_FLUID_STORED, 0);
 		}
 		if (!nbt.hasKey(TAG_TIME)) {
-			nbt.setLong(TAG_TIME, -1L);
+			nbt.setInteger(TAG_TIME, 100);
 		}
 	}
 
