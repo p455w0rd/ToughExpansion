@@ -180,7 +180,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 			for (EntityPlayer player : PLAYER_TIMERS.keySet()) {
 				NBTTagCompound timerListNBTEntry = new NBTTagCompound();
 				timerListNBTEntry.setString(TAG_TIMERLISTENTRY_PLAYERID, player.getUniqueID().toString());
-				timerListNBTEntry.setLong(TAG_TIMERLISTENTRY_TIME, PLAYER_TIMERS.get(player));
+				timerListNBTEntry.setInteger(TAG_TIMERLISTENTRY_TIME, PLAYER_TIMERS.get(player));
 				tagList.appendTag(timerListNBTEntry);
 			}
 			compound.setTag(TAG_TIMERLIST, tagList);
