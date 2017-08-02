@@ -6,22 +6,17 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.input.Keyboard;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.Interface;
@@ -31,7 +26,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.tanaddons.init.ModConfig.Options;
 import p455w0rd.tanaddons.init.ModCreativeTab;
 import p455w0rd.tanaddons.init.ModGlobals;
-import p455w0rdslib.util.EasyMappings;
 import p455w0rdslib.util.ReadableNumberConverter;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.SyncedConfig;
@@ -134,17 +128,11 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
-		if (EasyMappings.player() != null && EasyMappings.player().isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
-			tooltip.add("");
-			tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc"));
-			tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
-			if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
-				tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
-			}
-		}
-		else {
-			tooltip.add(TextFormatting.ITALIC + "" + TextFormatting.AQUA + "" + I18n.format("tooltip.tanaddons.holdshift", sneak.getDisplayName()));
+		tooltip.add("");
+		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc"));
+		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
+		if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
+			tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
 		}
 	}
 
