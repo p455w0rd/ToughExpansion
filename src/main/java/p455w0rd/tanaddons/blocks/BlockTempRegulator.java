@@ -141,27 +141,5 @@ public class BlockTempRegulator extends BlockBase {
 				ACTIVE
 		});
 	}
-	/*
-		@Nullable
-		private ItemStack getTileDataItemStack(World worldIn, BlockPos pos, IBlockState state) {
-			if (getTE(worldIn, pos) != null) {
-				ItemStack itemstack = new ItemStack(this);
-				NBTTagCompound nbttagcompound = getTE(worldIn, pos).writeToNBT(new NBTTagCompound());
-				itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
-				return itemstack;
-			}
-			return null;
-		}
-	
-		@Override
-		public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
-			ItemStack itemstack = getTileDataItemStack(worldIn, pos, state);
-			return itemstack != null ? itemstack : new ItemStack(this);
-		}
-	
-		@Override
-		public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-			return Lists.newArrayList(getItem((World) world, pos, state));
-		}
-	*/
+
 }

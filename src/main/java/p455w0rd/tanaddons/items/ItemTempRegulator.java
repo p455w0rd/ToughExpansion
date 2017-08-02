@@ -4,21 +4,16 @@ import static p455w0rd.tanaddons.init.ModGlobals.MODID_BAUBLES;
 
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.Interface;
@@ -58,7 +53,7 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 		}
 		NBTTagCompound nbt = stack.getTagCompound();
 		if (!nbt.hasKey(TAG_TIME)) {
-			nbt.setLong(TAG_TIME, -1L);
+			nbt.setInteger(TAG_TIME, 100);
 		}
 	}
 
@@ -75,50 +70,47 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 			ITemperature data = TemperatureHelper.getTemperatureData(player);
 			Temperature playerTemp = data.getTemperature();
 			int currentTemp = playerTemp.getRawValue();
+			int currentTime = getTime(stack);
 			if (currentTemp != 14) {
-				if (getTime(stack) != -1L) {
-					long startTime = getTime(stack);
-					if (ModGlobals.TIMER >= startTime + 1000L) {
-						//tempHandler.setChangeTime(0);
-						player.removePotionEffect(TANPotions.hypothermia);
-						player.removePotionEffect(TANPotions.hyperthermia);
-						if (currentTemp < 14) {
-							tempHandler.setTemperature(new Temperature(currentTemp + 1));
-						}
-						else if (currentTemp > 14) {
-							tempHandler.setTemperature(new Temperature(currentTemp - 1));
-						}
-						setTime(stack, -1L);
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+				if (currentTime <= 0) {
+					tempHandler.setChangeTime(0);
+					player.removePotionEffect(TANPotions.hypothermia);
+					player.removePotionEffect(TANPotions.hyperthermia);
+					if (currentTemp < 14) {
+						tempHandler.setTemperature(new Temperature(currentTemp + 1));
 					}
-					else {
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+					else if (currentTemp > 14) {
+						tempHandler.setTemperature(new Temperature(currentTemp - 1));
 					}
+					setTime(stack, 100);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 				else {
-					setTime(stack, ModGlobals.TIMER);
-					setEnergyStored(stack, getEnergyStored(stack) - 100);
+					setTime(stack, currentTime - 1);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 			}
 			else {
-				setTime(stack, -1L);
+				if (getTime(stack) != 100) {
+					setTime(stack, 100);
+				}
 			}
 		}
 	}
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) != -1L && getEnergyStored(stack) > 0;
+		return getTime(stack) < 100 && getEnergyStored(stack) > 10;
 	}
 
-	private long getTime(ItemStack stack) {
+	private int getTime(ItemStack stack) {
 		init(stack);
-		return stack.getTagCompound().getLong(TAG_TIME);
+		return stack.getTagCompound().getInteger(TAG_TIME);
 	}
 
-	private void setTime(ItemStack stack, long amount) {
+	private void setTime(ItemStack stack, int amount) {
 		init(stack);
-		stack.getTagCompound().setLong(TAG_TIME, amount);
+		stack.getTagCompound().setInteger(TAG_TIME, amount);
 	}
 
 	@Override
@@ -133,17 +125,11 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
-		if (player.isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
-			tooltip.add("");
-			tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc"));
-			tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
-			if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
-				tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
-			}
-		}
-		else {
-			tooltip.add(TextFormatting.ITALIC + "" + TextFormatting.AQUA + "" + I18n.format("tooltip.tanaddons.holdshift", sneak.getDisplayName()));
+		tooltip.add("");
+		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc"));
+		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
+		if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
+			tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
 		}
 	}
 

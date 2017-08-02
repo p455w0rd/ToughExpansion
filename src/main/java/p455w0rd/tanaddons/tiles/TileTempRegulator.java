@@ -23,7 +23,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import p455w0rd.tanaddons.init.ModConfig.Options;
-import p455w0rd.tanaddons.init.ModGlobals;
 import toughasnails.api.TANPotions;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.temperature.Temperature;
@@ -45,7 +44,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	private final String TAG_TIMERLIST = "TimerList";
 	private final String TAG_TIMERLISTENTRY_PLAYERID = "PlayerID";
 	private final String TAG_TIMERLISTENTRY_TIME = "Time";
-	private Map<EntityPlayer, Long> PLAYER_TIMERS = Maps.newHashMap();
+	private Map<EntityPlayer, Integer> PLAYER_TIMERS = Maps.newHashMap();
 
 	public TileTempRegulator() {
 
@@ -158,11 +157,11 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		}
 		if (compound.hasKey(TAG_TIMERLIST) && compound.getTagList(TAG_TIMERLIST, 10).tagCount() > 0) {
 			NBTTagList tagList = compound.getTagList(TAG_TIMERLIST, 10);
-			Map<EntityPlayer, Long> newList = Maps.newHashMap();
+			Map<EntityPlayer, Integer> newList = Maps.newHashMap();
 			for (int i = 0; i < tagList.tagCount(); i++) {
 				NBTTagCompound entry = tagList.getCompoundTagAt(i);
 				EntityPlayer player = getWorld().getPlayerEntityByUUID(UUID.fromString(entry.getString(TAG_TIMERLISTENTRY_PLAYERID)));
-				newList.put(player, entry.getLong(TAG_TIMERLISTENTRY_TIME));
+				newList.put(player, entry.getInteger(TAG_TIMERLISTENTRY_TIME));
 			}
 			PLAYER_TIMERS = newList;
 		}
@@ -178,7 +177,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 			for (EntityPlayer player : PLAYER_TIMERS.keySet()) {
 				NBTTagCompound timerListNBTEntry = new NBTTagCompound();
 				timerListNBTEntry.setString(TAG_TIMERLISTENTRY_PLAYERID, player.getUniqueID().toString());
-				timerListNBTEntry.setLong(TAG_TIMERLISTENTRY_TIME, PLAYER_TIMERS.get(player));
+				timerListNBTEntry.setInteger(TAG_TIMERLISTENTRY_TIME, PLAYER_TIMERS.get(player));
 				tagList.appendTag(timerListNBTEntry);
 			}
 			compound.setTag(TAG_TIMERLIST, tagList);
@@ -205,27 +204,22 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 				ITemperature data = TemperatureHelper.getTemperatureData(player);
 				Temperature playerTemp = data.getTemperature();
 				int currentTemp = playerTemp.getRawValue();
+				int currentTime = getTime(player);
 				if (currentTemp != 14) {
-					if (getTime(player) != -1L) {
-						long startTime = getTime(player);
-						if (ModGlobals.TIMER >= startTime + 1000L) {
-							player.removePotionEffect(TANPotions.hypothermia);
-							player.removePotionEffect(TANPotions.hyperthermia);
-							if (currentTemp < 14) {
-								tempHandler.setTemperature(new Temperature(currentTemp + 1));
-							}
-							else if (currentTemp > 14) {
-								tempHandler.setTemperature(new Temperature(currentTemp - 1));
-							}
-							setTime(player, -1L);
-							setEnergyStored(getEnergyStored() - ENERGY_USE);
+					if (getTime(player) <= 0) {
+						player.removePotionEffect(TANPotions.hypothermia);
+						player.removePotionEffect(TANPotions.hyperthermia);
+						if (currentTemp < 14) {
+							tempHandler.setTemperature(new Temperature(currentTemp + 1));
 						}
-						else {
-							setEnergyStored(getEnergyStored() - ENERGY_USE);
+						else if (currentTemp > 14) {
+							tempHandler.setTemperature(new Temperature(currentTemp - 1));
 						}
+						setTime(player, 100);
+						setEnergyStored(getEnergyStored() - ENERGY_USE);
 					}
 					else {
-						setTime(player, ModGlobals.TIMER);
+						setTime(player, currentTime - 1);
 						setEnergyStored(getEnergyStored() - ENERGY_USE);
 					}
 				}
@@ -237,11 +231,11 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 
 	}
 
-	private long getTime(EntityPlayer player) {
+	private int getTime(EntityPlayer player) {
 		if (PLAYER_TIMERS.containsKey(player)) {
 			return PLAYER_TIMERS.get(player);
 		}
-		return -1L;
+		return 100;
 	}
 
 	private void removePlayerTimer(EntityPlayer player) {
@@ -250,12 +244,12 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		}
 	}
 
-	private void setTime(EntityPlayer player, long time) {
+	private void setTime(EntityPlayer player, int time) {
 		if (!PLAYER_TIMERS.containsKey(player)) {
 			PLAYER_TIMERS.put(player, time);
 		}
 		else {
-			long currentTimeCached = PLAYER_TIMERS.get(player);
+			int currentTimeCached = PLAYER_TIMERS.get(player);
 			PLAYER_TIMERS.replace(player, currentTimeCached, time);
 		}
 	}

@@ -4,8 +4,6 @@ import static p455w0rd.tanaddons.init.ModGlobals.MODID_BAUBLES;
 
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import baubles.api.BaubleType;
@@ -13,9 +11,7 @@ import baubles.api.IBauble;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -33,7 +29,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -102,31 +97,28 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			EntityPlayer player = (EntityPlayer) entity;
 			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(player);
 			int currentThirst = thirstHandler.getThirst();
+			int currentTime = getTime(stack);
 			if (currentThirst < 20) {
-				if (getTime(stack) != -1L) {
-					long startTime = getTime(stack);
-					if (ModGlobals.TIMER >= startTime + 1000L) {
-						player.removePotionEffect(TANPotions.thirst);
-						if (currentThirst < 20) {
-							thirstHandler.setThirst(currentThirst + 1);
-							thirstHandler.setHydration(5.0F);
-							thirstHandler.setExhaustion(0.0F);
-						}
-						drainFluid(stack, 100);
-						setTime(stack, -1L);
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
+				if (currentTime <= 0) {
+					player.removePotionEffect(TANPotions.thirst);
+					if (currentThirst < 20) {
+						thirstHandler.setThirst(currentThirst + 1);
+						thirstHandler.setHydration(5.0F);
+						thirstHandler.setExhaustion(0.0F);
 					}
-					else {
-						setEnergyStored(stack, getEnergyStored(stack) - 100);
-					}
+					drainFluid(stack, 100);
+					setTime(stack, 50);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 				else {
-					setTime(stack, ModGlobals.TIMER);
-					setEnergyStored(stack, getEnergyStored(stack) - 100);
+					setTime(stack, currentTime - 1);
+					setEnergyStored(stack, getEnergyStored(stack) - 10);
 				}
 			}
 			else {
-				setTime(stack, -1L);
+				if (getTime(stack) != 50) {
+					setTime(stack, 50);
+				}
 			}
 		}
 	}
@@ -176,7 +168,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			nbt.setInteger(TAG_FLUID_STORED, 0);
 		}
 		if (!nbt.hasKey(TAG_TIME)) {
-			nbt.setLong(TAG_TIME, -1L);
+			nbt.setInteger(TAG_TIME, 100);
 		}
 	}
 
@@ -199,14 +191,14 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 		return getTime(stack) != -1L && getEnergyStored(stack) > 0;
 	}
 
-	private long getTime(ItemStack stack) {
+	private int getTime(ItemStack stack) {
 		init(stack);
-		return stack.getTagCompound().getLong(TAG_TIME);
+		return stack.getTagCompound().getInteger(TAG_TIME);
 	}
 
-	private void setTime(ItemStack stack, long amount) {
+	private void setTime(ItemStack stack, int amount) {
 		init(stack);
-		stack.getTagCompound().setLong(TAG_TIME, amount);
+		stack.getTagCompound().setInteger(TAG_TIME, amount);
 	}
 
 	private void drainFluid(ItemStack stack, int amount) {
@@ -230,18 +222,12 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
 		tooltip.add("Stored Water: " + getFluidStored(stack) / 1000 + "/" + CAPACITY / 1000 + " Buckets");
-		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
-		if (player.isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
-			tooltip.add("");
-			tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));
-			tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc2"));
-			tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc3"));
-			if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
-				tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
-			}
-		}
-		else {
-			tooltip.add(TextFormatting.ITALIC + "" + TextFormatting.AQUA + "" + I18n.format("tooltip.tanaddons.holdshift", sneak.getDisplayName()));
+		tooltip.add("");
+		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));
+		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc2"));
+		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc3"));
+		if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
+			tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
 		}
 	}
 
