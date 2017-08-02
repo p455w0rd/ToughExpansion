@@ -8,18 +8,14 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.input.Keyboard;
-
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,7 +30,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -193,15 +188,9 @@ public class BlockTempRegulator extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		KeyBinding sneak = Minecraft.getMinecraft().gameSettings.keyBindSneak;
-		if (playerIn.isSneaking() || Keyboard.isKeyDown(sneak.getKeyCode())) {
-			tooltip.add("");
-			tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc"));
-			tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc2"));
-		}
-		else {
-			tooltip.add(TextFormatting.ITALIC + "" + TextFormatting.AQUA + "" + I18n.format("tooltip.tanaddons.holdshift", sneak.getDisplayName()));
-		}
+		tooltip.add("");
+		tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc"));
+		tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc2"));
 	}
 
 	@SideOnly(Side.CLIENT)
