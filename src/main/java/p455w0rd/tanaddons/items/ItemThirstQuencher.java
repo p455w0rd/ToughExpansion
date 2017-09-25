@@ -4,6 +4,7 @@ import static p455w0rd.tanaddons.init.ModGlobals.MODID_BAUBLES;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -32,11 +33,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.common.Optional.Method;
@@ -60,7 +63,7 @@ import toughasnails.thirst.ThirstHandler;
 public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	private static final String NAME = "thirst_quencher";
-	private final int CAPACITY = 16000;
+	private final int FLUID_CAPACITY;
 	protected int FLUID_STORED = 0;
 	private final String TAG_FLUID_STORED = "FluidStored";
 	private final String TAG_TIME = "TimeStart";
@@ -68,7 +71,54 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	public ItemThirstQuencher() {
 		super(Options.THIRST_QUENCHER_RF_CAPACITY, Options.THIRST_QUENCHER_RF_CAPACITY, 40, NAME);
 		setCreativeTab(ModCreativeTab.TAB);
+		FLUID_CAPACITY = (Options.THIRST_QUENCHER_WATER_CAPACITY < 8 ? 8 : Options.THIRST_QUENCHER_WATER_CAPACITY) * 1000;
 		addPropertyOverride(new ResourceLocation("filllevel"), (stack, world, entity) -> (getFluidStored(stack) / 1000) / 2);
+	}
+
+	@Override
+	public ICapabilityProvider initCapabilities(@Nonnull final ItemStack stack, @Nullable NBTTagCompound nbt) {
+		return new FluidHandlerItemStack(stack, FLUID_CAPACITY) {
+
+			@Override
+			public FluidStack getFluid() {
+				return new FluidStack(FluidRegistry.WATER, FLUID_STORED);
+			}
+
+			@Override
+			public int fill(FluidStack resource, boolean doFill) {
+				if (container.getCount() != 1 || resource == null || resource.amount <= 0 || !canFillFluidType(resource)) {
+					return 0;
+				}
+
+				FluidStack contained = getFluid();
+				if (contained == null) {
+					int fillAmount = Math.min(FLUID_CAPACITY, resource.amount);
+
+					if (doFill) {
+						FluidStack filled = resource.copy();
+						filled.amount = fillAmount;
+						setFluid(filled);
+					}
+					setFluidStored(stack, fillAmount);
+					return fillAmount;
+				}
+				else {
+					if (contained.isFluidEqual(resource)) {
+						int fillAmount = Math.min(FLUID_CAPACITY - contained.amount, resource.amount);
+
+						if (doFill && fillAmount > 0) {
+							contained.amount += fillAmount;
+							setFluid(contained);
+						}
+						setFluidStored(stack, fillAmount);
+						return fillAmount;
+					}
+
+					return 0;
+				}
+			}
+
+		};
 	}
 
 	@Override
@@ -78,8 +128,8 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			ItemStack item2 = new ItemStack(this);
 			ItemStack item3 = new ItemStack(this);
 			setFull(item);
-			addFluid(item2, CAPACITY);
-			addFluid(item3, CAPACITY);
+			addFluid(item2, FLUID_CAPACITY);
+			addFluid(item3, FLUID_CAPACITY);
 			setFull(item3);
 			subItems.add(new ItemStack(this)); // 0 RF - 0 Fluid
 			subItems.add(item); // full RF - 0 fluid
@@ -90,7 +140,8 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	private void doTick(Entity entity, ItemStack stack) {
 		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST)) {
-			if (getEnergyStored(stack) < 100 || getFluidStored(stack) < 100) {
+			int energyPerTick = Options.THIRST_QUNCHER_RF_PER_TICK;
+			if (getEnergyStored(stack) < energyPerTick || getFluidStored(stack) < 100) {
 				return;
 			}
 			EntityPlayer player = (EntityPlayer) entity;
@@ -107,11 +158,11 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 					}
 					drainFluid(stack, 100);
 					setTime(stack, 50);
-					setEnergyStored(stack, getEnergyStored(stack) - 10);
+					setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
 				}
 				else {
 					setTime(stack, currentTime - 1);
-					setEnergyStored(stack, getEnergyStored(stack) - 10);
+					setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
 				}
 			}
 			else {
@@ -129,15 +180,8 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 		if (stack.isEmpty()) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 		}
-
-		if (playerIn.isSneaking()) {
-			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(playerIn);
-			thirstHandler.setThirst(0);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-		}
-
 		init(stack);
-		if (getFluidStored(stack) >= CAPACITY) {
+		if (getFluidStored(stack) >= FLUID_CAPACITY) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 		}
 		RayTraceResult ray = rayTrace(worldIn, playerIn, true);
@@ -225,14 +269,14 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 		if (oldStack.getItem() == newStack.getItem()) {
 			return false;
 		}
-		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+		return slotChanged;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + CAPACITY + " mB");
+		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + FLUID_CAPACITY + " mB");
 		tooltip.add("");
 		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));
 		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc2"));

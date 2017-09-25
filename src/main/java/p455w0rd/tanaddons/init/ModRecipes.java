@@ -6,8 +6,10 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.potion.PotionUtils;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import p455w0rdslib.util.RecipeUtils;
 import toughasnails.api.TANBlocks;
@@ -72,6 +74,7 @@ public class ModRecipes {
 				new ItemStack(TANBlocks.temperature_coil, 1, 1)
 		}));
 
+		ItemStack waterBottle = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
 		CRAFTING_RECIPES.add(thirstQuencher = RecipeUtils.addOldShaped(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
 				"aba",
 				"aca",
@@ -83,7 +86,7 @@ public class ModRecipes {
 				Character.valueOf('c'),
 				new ItemStack(TANItems.canteen),
 				Character.valueOf('d'),
-				new ItemStack(TANItems.fruit_juice, 1, 6)
+				waterBottle
 		}));
 
 		for (IRecipe recipe : CRAFTING_RECIPES) {
