@@ -2,7 +2,9 @@ package p455w0rd.tanaddons.init;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionUtils;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import toughasnails.api.TANBlocks;
@@ -19,7 +21,7 @@ public class ModRecipes {
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.HEATER), new Object[] {
 				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(Items.BLAZE_ROD), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
 		}));
-
+		
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.AC), new Object[] {
 				"aba", "bcb", "aba", Character.valueOf('b'), new ItemStack(Items.REDSTONE), Character.valueOf('c'), new ItemStack(TANItems.freeze_rod), Character.valueOf('a'), new ItemStack(Blocks.IRON_BLOCK)
 		}));
@@ -54,6 +56,7 @@ public class ModRecipes {
 				new ItemStack(TANBlocks.temperature_coil, 1, 1)
 		}));
 
+		ItemStack waterBottle = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
 				"aba",
 				"aca",
@@ -65,7 +68,7 @@ public class ModRecipes {
 				Character.valueOf('c'),
 				new ItemStack(TANItems.canteen),
 				Character.valueOf('d'),
-				new ItemStack(TANItems.fruit_juice, 1, 6)
+				waterBottle
 		}));
 
 	}

@@ -36,7 +36,7 @@ import toughasnails.temperature.TemperatureHandler;
 public class TileTempRegulator extends TileEntity implements ITickable, IEnergyStorage, IEnergyReceiver {
 
 	private int INPUT = 10000;
-	private int ENERGY_USE = 100;
+	private final int ENERGY_USE;
 	private int ENERGY = 0;
 	public static final String TAG_ENERGY = "Energy";
 	private int REDSTONE_MODE = 0; //0 = requires redstone, 1 = requires lack of signal, 2 = redstone ignored
@@ -47,7 +47,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	private Map<EntityPlayer, Integer> PLAYER_TIMERS = Maps.newHashMap();
 
 	public TileTempRegulator() {
-
+		ENERGY_USE = Options.TEMP_REGULATOR_RF_PER_TICK;
 	}
 
 	@Override
