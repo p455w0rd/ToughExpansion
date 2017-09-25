@@ -26,6 +26,10 @@ public class ModConfig {
 		Options.THIRST_HEALTH_REGEN_FIX = CONFIG.getBoolean("ThirstHealthFix", DEF_CAT, true, "Makes health regen respect same logic as hunger. (If player has less than 10 thirst drops, health will not regen.)");
 		Options.THIRST_QUENCHER_RF_CAPACITY = CONFIG.getInt("ThirstQuencherRFCap", DEF_CAT, 400000, 100000, 1600000, "RF Capacity for Thirst Quencher");
 		Options.PORTABLE_TEMP_REGULATOR_CAPACITY = CONFIG.getInt("PortableTempRegulatorCap", DEF_CAT, 400000, 100000, 1600000, "RF Capacity for Portable Temperature Regular");
+		Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK = CONFIG.getInt("PortableTempRegulatorRFPerTick", DEF_CAT, 10, 1, 100, "How much RF per tick is consumed while the Portable Temp Regulator is actively regulating temperature");
+		Options.THIRST_QUNCHER_RF_PER_TICK = CONFIG.getInt("ThirstQuencherRFPerTick", DEF_CAT, 10, 1, 10000, "How much RF per tick is consumed while the Thirst Quencher is actively quenching thirst");
+		Options.TEMP_REGULATOR_RF_PER_TICK = CONFIG.getInt("TempRegulatorRFPerTick", DEF_CAT, 100, 1, 10000, "How much RF per tick is consumed while the Temp Regulator (block) is actively regulating temperature");
+		Options.THIRST_QUENCHER_WATER_CAPACITY = CONFIG.getInt("ThirstQuencherWaterCapacity", DEF_CAT, 16, 8, 64, "How much water (in buckets) the Thirst Quencher can hold");
 
 		if (CONFIG.hasChanged()) {
 			CONFIG.save();
@@ -46,6 +50,10 @@ public class ModConfig {
 		public static boolean THIRST_HEALTH_REGEN_FIX = true;
 		public static int THIRST_QUENCHER_RF_CAPACITY = 400000;
 		public static int PORTABLE_TEMP_REGULATOR_CAPACITY = 1600000;
+		public static int PORTABLE_TEMP_REGULATOR_RF_PER_TICK = 10;
+		public static int THIRST_QUNCHER_RF_PER_TICK = 10;
+		public static int TEMP_REGULATOR_RF_PER_TICK = 100;
+		public static int THIRST_QUENCHER_WATER_CAPACITY = 16;
 
 	}
 

@@ -58,7 +58,7 @@ public class BlockTempRegulator extends BlockBase {
 			}
 			else {
 				if (player.isSneaking()) {
-					player.addChatMessage(new TextComponentString("RF: " + getTE(world, pos).getEnergyStored() + " (" + getTE(world, pos).getEnergyUse() + " RF/t per player while adjusting temp)"));
+					player.sendMessage(new TextComponentString("RF: " + getTE(world, pos).getEnergyStored() + " (" + getTE(world, pos).getEnergyUse() + " RF/t per player while adjusting temp)"));
 				}
 				else {
 
@@ -67,7 +67,7 @@ public class BlockTempRegulator extends BlockBase {
 							"message.tanaddons.redstoneignored",
 							"message.tanaddons.redstonerequired"
 					};
-					player.addChatMessage(new TextComponentString(I18n.format(msg[getTE(world, pos).getMode()])));
+					player.sendMessage(new TextComponentString(I18n.format(msg[getTE(world, pos).getMode()])));
 					return true;
 				}
 			}
@@ -115,7 +115,7 @@ public class BlockTempRegulator extends BlockBase {
 	}
 
 	@Override
-	public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		boolean running = getTE(world, pos) == null ? false : getTE(world, pos).isRunning();
 		return getDefaultState().withProperty(ACTIVE, Boolean.valueOf(running));
 	}

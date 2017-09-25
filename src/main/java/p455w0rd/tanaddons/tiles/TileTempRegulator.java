@@ -36,7 +36,7 @@ import toughasnails.temperature.TemperatureHandler;
 public class TileTempRegulator extends TileEntity implements ITickable, IEnergyStorage, IEnergyReceiver {
 
 	private int INPUT = 10000;
-	private int ENERGY_USE = 100;
+	private final int ENERGY_USE;
 	private int ENERGY = 0;
 	private final String TAG_ENERGY = "Energy";
 	private int REDSTONE_MODE = 0; //0 = requires redstone, 1 = 0 redstone signal required, 2 = redstone ignored
@@ -47,7 +47,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	private Map<EntityPlayer, Integer> PLAYER_TIMERS = Maps.newHashMap();
 
 	public TileTempRegulator() {
-
+		ENERGY_USE = Options.TEMP_REGULATOR_RF_PER_TICK;
 	}
 
 	@Override
@@ -69,9 +69,9 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		switch (REDSTONE_MODE) {
 		case 0:
 		default:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) > 0 || worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 1:
-			return (worldObj.isBlockIndirectlyGettingPowered(pos) == 0 && !worldObj.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) == 0 && !world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
 		case 2:
 			return getEnergyStored() > ENERGY_USE;
 		}
@@ -160,6 +160,9 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 			Map<EntityPlayer, Integer> newList = Maps.newHashMap();
 			for (int i = 0; i < tagList.tagCount(); i++) {
 				NBTTagCompound entry = tagList.getCompoundTagAt(i);
+				if (entry == null || getWorld() == null || entry.getString(TAG_TIMERLISTENTRY_PLAYERID) == null) {
+					continue;
+				}
 				EntityPlayer player = getWorld().getPlayerEntityByUUID(UUID.fromString(entry.getString(TAG_TIMERLISTENTRY_PLAYERID)));
 				newList.put(player, entry.getInteger(TAG_TIMERLISTENTRY_TIME));
 			}

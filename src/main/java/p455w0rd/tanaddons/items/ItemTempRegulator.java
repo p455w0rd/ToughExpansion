@@ -59,8 +59,9 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 
 	private void doTick(Entity entity, ItemStack stack) {
 		init(stack);
+		int energy = Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
 		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_TEMPERATURE)) {
-			if (getEnergyStored(stack) < 100) {
+			if (getEnergyStored(stack) < energy) {
 				return;
 			}
 
@@ -83,11 +84,11 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 						tempHandler.setTemperature(new Temperature(currentTemp - 1));
 					}
 					setTime(stack, 100);
-					setEnergyStored(stack, getEnergyStored(stack) - 10);
+					setEnergyStored(stack, getEnergyStored(stack) - energy);
 				}
 				else {
 					setTime(stack, currentTime - 1);
-					setEnergyStored(stack, getEnergyStored(stack) - 10);
+					setEnergyStored(stack, getEnergyStored(stack) - energy);
 				}
 			}
 			else {
