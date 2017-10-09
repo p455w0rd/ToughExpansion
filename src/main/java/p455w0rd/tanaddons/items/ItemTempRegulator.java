@@ -26,7 +26,7 @@ import p455w0rd.tanaddons.init.ModGlobals;
 import p455w0rdslib.util.ReadableNumberConverter;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.SyncedConfig;
-import toughasnails.api.config.TemperatureOption;
+import toughasnails.api.config.GameplayOption;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.temperature.Temperature;
 import toughasnails.api.temperature.TemperatureHelper;
@@ -60,7 +60,7 @@ public class ItemTempRegulator extends ItemRF implements IBauble {
 	private void doTick(Entity entity, ItemStack stack) {
 		init(stack);
 		int energy = Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
-		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(TemperatureOption.ENABLE_TEMPERATURE)) {
+		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_TEMPERATURE)) {
 			if (getEnergyStored(stack) < energy) {
 				return;
 			}

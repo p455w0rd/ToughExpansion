@@ -27,7 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
@@ -60,7 +59,7 @@ public class BlockTempRegulator extends BlockContainer {
 
 			@Override
 			@SideOnly(Side.CLIENT)
-			public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
+			public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 				block.getSubBlocks(itemIn, tab, subItems);
 				ItemStack full = new ItemStack(block);
 				NBTTagCompound compound = new NBTTagCompound();
@@ -73,7 +72,7 @@ public class BlockTempRegulator extends BlockContainer {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-				NBTTagCompound tag = stack.getSubCompound("BlockEntityTag");
+				NBTTagCompound tag = stack.getSubCompound("BlockEntityTag", true);
 				if (tag != null && tag.getInteger(TAG_ENERGY) == Options.TEMP_REGULATOR_RF_CAPACITY) {
 					tooltip.add("Fully Powered");
 				}
@@ -92,7 +91,7 @@ public class BlockTempRegulator extends BlockContainer {
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (hand == EnumHand.MAIN_HAND && getTE(world, pos) != null) {
 			if (!world.isRemote) {
 				if (!player.isSneaking()) {
@@ -158,7 +157,7 @@ public class BlockTempRegulator extends BlockContainer {
 	}
 
 	@Override
-	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		boolean running = getTE(world, pos) == null ? false : getTE(world, pos).isRunning();
 		return getDefaultState().withProperty(ACTIVE, Boolean.valueOf(running));
 	}

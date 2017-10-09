@@ -29,7 +29,6 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -92,7 +91,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 			@Override
 			public int fill(FluidStack resource, boolean doFill) {
-				if (container.getCount() != 1 || resource == null || resource.amount <= 0 || !canFillFluidType(resource)) {
+				if (container.stackSize != 1 || resource == null || resource.amount <= 0 || !canFillFluidType(resource)) {
 					return 0;
 				}
 
@@ -128,7 +127,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	}
 
 	@Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		ItemStack item = new ItemStack(this);
 		ItemStack item2 = new ItemStack(this);
 		ItemStack item3 = new ItemStack(this);
@@ -178,12 +177,12 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 
-		ItemStack stack = playerIn.getHeldItemMainhand();
+		/*ItemStack stack = playerIn.getHeldItemMainhand();
 		if (stack.isEmpty()) {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-		}
+		}*/
 		/*
 		if (playerIn.isSneaking()) {
 			ThirstHandler thirstHandler = (ThirstHandler) ThirstHelper.getThirstData(playerIn);

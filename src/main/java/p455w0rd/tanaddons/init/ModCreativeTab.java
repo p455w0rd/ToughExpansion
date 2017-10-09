@@ -1,6 +1,7 @@
 package p455w0rd.tanaddons.init;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -21,7 +22,7 @@ public class ModCreativeTab extends CreativeTabs {
 	}
 
 	@Override
-	public ItemStack getTabIconItem() {
-		return new ItemStack(ModBlocks.TEMP_REGULATOR);
+	public Item getTabIconItem() {
+		return new ItemStack(ModBlocks.TEMP_REGULATOR).getItem();
 	}
 }
