@@ -7,7 +7,7 @@ public class ModGlobals {
 	public static final String MODID_PWLIB = "p455w0rdslib";
 
 	public static final String MODID = "tanaddons";
-	public static final String VERSION = "3.2.7";
+	public static final String VERSION = "3.2.8";
 	public static final String NAME = "Tough Expansion";
 	public static final String SERVER_PROXY = "p455w0rd.tanaddons.proxy.CommonProxy";
 	public static final String CLIENT_PROXY = "p455w0rd.tanaddons.proxy.ClientProxy";

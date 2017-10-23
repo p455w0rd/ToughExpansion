@@ -21,6 +21,8 @@ import toughasnails.api.item.TANItems;
  */
 public class ModRecipes {
 
+	private static RecipeUtils recipeUtils = new RecipeUtils(ModGlobals.MODID, ModGlobals.NAME);
+
 	private static final ModRecipes INSTANCE = new ModRecipes();
 	private static boolean init = true;
 
@@ -44,7 +46,7 @@ public class ModRecipes {
 	@SuppressWarnings("deprecation")
 	public void addRecipes() {
 
-		CRAFTING_RECIPES.add(tempRegulator = RecipeUtils.addOldShaped(new ItemStack(ModBlocks.TEMP_REGULATOR), new Object[] {
+		CRAFTING_RECIPES.add(tempRegulator = recipeUtils.addOldShaped(new ItemStack(ModBlocks.TEMP_REGULATOR), new Object[] {
 				"aaa",
 				"bcd",
 				"eee",
@@ -60,7 +62,7 @@ public class ModRecipes {
 				new ItemStack(TANItems.freeze_rod)
 		}));
 
-		CRAFTING_RECIPES.add(portableTempRegulator = RecipeUtils.addOldShaped(new ItemStack(ModItems.TEMP_REGULATOR), new Object[] {
+		CRAFTING_RECIPES.add(portableTempRegulator = recipeUtils.addOldShaped(new ItemStack(ModItems.TEMP_REGULATOR), new Object[] {
 				"aba",
 				"aca",
 				"ada",
@@ -75,7 +77,7 @@ public class ModRecipes {
 		}));
 
 		ItemStack waterBottle = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
-		CRAFTING_RECIPES.add(thirstQuencher = RecipeUtils.addOldShaped(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
+		CRAFTING_RECIPES.add(thirstQuencher = recipeUtils.addOldShaped(new ItemStack(ModItems.THIRST_QUENCHER), new Object[] {
 				"aba",
 				"aca",
 				"ada",

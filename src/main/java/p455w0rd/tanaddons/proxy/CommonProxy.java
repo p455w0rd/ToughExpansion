@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import p455w0rd.tanaddons.init.ModBlocks;
 import p455w0rd.tanaddons.init.ModConfig;
 import p455w0rd.tanaddons.init.ModEvents;
+import p455w0rd.tanaddons.init.ModIntegration;
 import p455w0rd.tanaddons.init.ModItems;
 import p455w0rd.tanaddons.init.ModNetworking;
 import p455w0rd.tanaddons.init.ModRecipes;
@@ -26,7 +27,7 @@ public class CommonProxy {
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
-
+		ModIntegration.postInit();
 	}
 
 	public void serverStarting(FMLServerStartingEvent e) {
