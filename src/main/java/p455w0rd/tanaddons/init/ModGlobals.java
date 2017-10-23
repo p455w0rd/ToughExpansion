@@ -13,6 +13,6 @@ public class ModGlobals {
 	public static final String CLIENT_PROXY = "p455w0rd.tanaddons.proxy.ClientProxy";
 	public static final String GUI_FACTORY = "p455w0rd.tanaddons.client.gui.GuiFactory";
 	public static final String CONFIG_FILE = "config/ToughExpansion.cfg";
-	public static final String DEPENDANCIES = "required-after:" + MODID_TAN + ";required-after:" + MODID_PWLIB + ";after:" + MODID_BAUBLES;
+	public static final String DEPENDANCIES = "required-after:" + MODID_TAN + ";required-after:" + MODID_PWLIB + "[2.0.22,);after:" + MODID_BAUBLES;
 
 }
