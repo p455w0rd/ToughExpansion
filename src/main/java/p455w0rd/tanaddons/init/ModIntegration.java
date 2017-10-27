@@ -10,7 +10,9 @@ import p455w0rd.tanaddons.integration.IC2;
 public class ModIntegration {
 
 	public static void postInit() {
-		IC2.postInit();
+		if (Mods.IC2.isLoaded()) {
+			IC2.postInit();
+		}
 	}
 
 	public static enum Mods {
