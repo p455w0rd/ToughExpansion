@@ -27,13 +27,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -60,7 +63,7 @@ import toughasnails.thirst.ThirstHandler;
  *
  */
 @Interface(iface = "baubles.api.IBauble", modid = MODID_BAUBLES, striprefs = true)
-public class ItemThirstQuencher extends ItemRF implements IBauble {
+public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 
 	private static final String NAME = "thirst_quencher";
 	private final int FLUID_CAPACITY;
@@ -77,6 +80,22 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 
 	@Override
 	public ICapabilityProvider initCapabilities(@Nonnull final ItemStack stack, @Nullable NBTTagCompound nbt) {
+		return new ICapabilityProvider() {
+
+			@Override
+			public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+				return getFluidProvider(stack).hasCapability(capability, facing) || getForgeEnergyProvider(stack).hasCapability(capability, facing);
+			}
+
+			@Override
+			public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+				return capability == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY ? getFluidProvider(stack).getCapability(capability, facing) : capability == CapabilityEnergy.ENERGY ? getForgeEnergyProvider(stack).getCapability(capability, facing) : null;
+			}
+
+		};
+	}
+
+	protected FluidHandlerItemStack getFluidProvider(ItemStack stack) {
 		return new FluidHandlerItemStack(stack, FLUID_CAPACITY) {
 
 			@Override
@@ -127,14 +146,59 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 			ItemStack item = new ItemStack(this);
 			ItemStack item2 = new ItemStack(this);
 			ItemStack item3 = new ItemStack(this);
-			setFull(item);
+			setFullEnergy(item);
 			addFluid(item2, FLUID_CAPACITY);
 			addFluid(item3, FLUID_CAPACITY);
-			setFull(item3);
+			setFullEnergy(item3);
 			subItems.add(new ItemStack(this)); // 0 RF - 0 Fluid
 			subItems.add(item); // full RF - 0 fluid
 			subItems.add(item2); // 0 RF - full fluid
 			subItems.add(item3); // full RF - full fluid
+		}
+	}
+
+	public int getFluidStored(ItemStack stack) {
+		init(stack);
+		return stack.getTagCompound().getInteger(TAG_FLUID_STORED);
+	}
+
+	private void setFluidStored(ItemStack stack, int amount) {
+		init(stack);
+		stack.getTagCompound().setInteger(TAG_FLUID_STORED, amount);
+	}
+
+	private void addFluid(ItemStack stack, int amount) {
+		setFluidStored(stack, getFluidStored(stack) + amount);
+	}
+
+	private int getTime(ItemStack stack) {
+		init(stack);
+		return stack.getTagCompound().getInteger(TAG_TIME);
+	}
+
+	private void setTime(ItemStack stack, int amount) {
+		init(stack);
+		stack.getTagCompound().setLong(TAG_TIME, amount);
+	}
+
+	private void drainFluid(ItemStack stack, int amount) {
+		int amountStored = getFluidStored(stack) - amount;
+		if (amountStored < 0) {
+			amountStored = 0;
+		}
+		setFluidStored(stack, amountStored);
+	}
+
+	private void init(ItemStack stack) {
+		if (!stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+		}
+		NBTTagCompound nbt = stack.getTagCompound();
+		if (!nbt.hasKey(TAG_FLUID_STORED)) {
+			nbt.setInteger(TAG_FLUID_STORED, 0);
+		}
+		if (!nbt.hasKey(TAG_TIME)) {
+			nbt.setInteger(TAG_TIME, 100);
 		}
 	}
 
@@ -214,54 +278,9 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 		return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 	}
 
-	private void init(ItemStack stack) {
-		if (!stack.hasTagCompound()) {
-			stack.setTagCompound(new NBTTagCompound());
-		}
-		NBTTagCompound nbt = stack.getTagCompound();
-		if (!nbt.hasKey(TAG_FLUID_STORED)) {
-			nbt.setInteger(TAG_FLUID_STORED, 0);
-		}
-		if (!nbt.hasKey(TAG_TIME)) {
-			nbt.setInteger(TAG_TIME, 100);
-		}
-	}
-
-	private int getFluidStored(ItemStack stack) {
-		init(stack);
-		return stack.getTagCompound().getInteger(TAG_FLUID_STORED);
-	}
-
-	private void setFluidStored(ItemStack stack, int amount) {
-		init(stack);
-		stack.getTagCompound().setInteger(TAG_FLUID_STORED, amount);
-	}
-
-	private void addFluid(ItemStack stack, int amount) {
-		setFluidStored(stack, getFluidStored(stack) + amount);
-	}
-
 	@Override
 	public boolean hasEffect(ItemStack stack) {
 		return getTime(stack) < 50 && getEnergyStored(stack) > 10;
-	}
-
-	private int getTime(ItemStack stack) {
-		init(stack);
-		return stack.getTagCompound().getInteger(TAG_TIME);
-	}
-
-	private void setTime(ItemStack stack, int amount) {
-		init(stack);
-		stack.getTagCompound().setLong(TAG_TIME, amount);
-	}
-
-	private void drainFluid(ItemStack stack, int amount) {
-		int amountStored = getFluidStored(stack) - amount;
-		if (amountStored < 0) {
-			amountStored = 0;
-		}
-		setFluidStored(stack, amountStored);
 	}
 
 	@Override
@@ -275,7 +294,7 @@ public class ItemThirstQuencher extends ItemRF implements IBauble {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
-		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
+		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " Energy");
 		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + FLUID_CAPACITY + " mB");
 		tooltip.add("");
 		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));

@@ -10,10 +10,10 @@ name.TRINKET=Baubles Trinket
 itemGroup.tanaddons=Tough Expansion
 
 tooltip.tanaddons.thirstquencher.desc=Right-click on a water source block or tank with water to fill
-tooltip.tanaddons.thirstquencher.desc2=Requires water and RF to run.
+tooltip.tanaddons.thirstquencher.desc2=Requires water and Forge Energy to run.
 tooltip.tanaddons.thirstquencher.desc3=Automatically cleans water
 tooltip.tanaddons.ptempregulator.desc=Keeps player temperature at optimal level
-tooltip.tanaddons.ptempregulator.desc2=Requires RF to function
+tooltip.tanaddons.ptempregulator.desc2=Requires Forge Energy to function
 tooltip.tanaddons.holdshift=<Hold %s for Info>
 tooltip.tanaddons.baublesitem=Can be used in %s Baubles slot
 tooltip.tanaddons.redstone_rclick.desc=Right-click with empty hand to set redstone mode

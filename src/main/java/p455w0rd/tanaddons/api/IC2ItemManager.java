@@ -1,6 +1,5 @@
 package p455w0rd.tanaddons.api;
 
-import cofh.redstoneflux.api.IEnergyContainerItem;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.IBackupElectricItemManager;
 import ic2.api.item.IElectricItem;
@@ -8,7 +7,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.energy.CapabilityEnergy;
+import p455w0rd.tanaddons.init.ModIntegration.Mods;
+import p455w0rd.tanaddons.items.ItemForgeEnergy;
 
 /**
  * @author p455w0rd
@@ -32,16 +33,15 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public double charge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean simulate) {
-		if (getTier(stack) > tier) {
+		if (!handles(stack) || getTier(stack) > tier) {
 			return 0.0D;
 		}
 		final double limit = getTransferLimit(stack);
-		final IEnergyContainerItem poweredItem = (IEnergyContainerItem) stack.getItem();
 		double toAdd = amount;
 		if (!ignoreTransferLimit && amount > limit) {
 			toAdd = limit;
 		}
-		return convertToEU(poweredItem.receiveEnergy(stack, convertToRF(toAdd), simulate));
+		return convertToEU(getEnergyItem(stack).receiveEnergy(stack, convertToRF(toAdd), simulate));
 	}
 
 	@Override
@@ -51,14 +51,18 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public double getCharge(ItemStack stack) {
-		final IEnergyContainerItem poweredItem = (IEnergyContainerItem) stack.getItem();
-		return (int) convertToEU(poweredItem.getEnergyStored(stack));
+		if (handles(stack)) {
+			return (int) convertToEU(getEnergyItem(stack).getEnergyStored(stack));
+		}
+		return 0;
 	}
 
 	@Override
 	public double getMaxCharge(ItemStack stack) {
-		final IEnergyContainerItem poweredItem = (IEnergyContainerItem) stack.getItem();
-		return convertToEU(poweredItem.getMaxEnergyStored(stack));
+		if (handles(stack)) {
+			return convertToEU(getEnergyItem(stack).getMaxEnergyStored(stack));
+		}
+		return 0;
 	}
 
 	@Override
@@ -68,11 +72,9 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public boolean use(ItemStack stack, double amount, EntityLivingBase entity) {
-		final IEnergyContainerItem poweredItem = (IEnergyContainerItem) stack.getItem();
-
-		if (canUse(stack, amount)) {
+		if (handles(stack) && canUse(stack, amount)) {
 			final double toUse = convertToRF(amount);
-			poweredItem.extractEnergy(stack, (int) toUse, false);
+			getEnergyItem(stack).extractEnergy(stack, (int) toUse, false);
 			return true;
 		}
 		return false;
@@ -80,7 +82,7 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public void chargeFromArmor(ItemStack stack, EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && Loader.isModLoaded("ic2")) {
+		if (entity instanceof EntityPlayer && Mods.IC2.isLoaded()) {
 			EntityPlayer player = (EntityPlayer) entity;
 			ItemStack chestStack = player.inventory.armorItemInSlot(2);
 			if (chestStack != null) {
@@ -107,7 +109,11 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public boolean handles(ItemStack stack) {
-		return !stack.isEmpty() && (stack.getItem() instanceof IEnergyContainerItem);
+		return !stack.isEmpty() && stack.hasCapability(CapabilityEnergy.ENERGY, null);
+	}
+
+	public ItemForgeEnergy getEnergyItem(ItemStack stack) {
+		return handles(stack) && (stack.getItem() instanceof ItemForgeEnergy) ? (ItemForgeEnergy) stack.getItem() : null;
 	}
 
 	private double getTransferLimit(ItemStack itemStack) {

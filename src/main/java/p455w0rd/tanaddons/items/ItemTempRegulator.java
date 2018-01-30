@@ -40,7 +40,7 @@ import toughasnails.temperature.TemperatureHandler;
  *
  */
 @Interface(iface = "baubles.api.IBauble", modid = MODID_BAUBLES, striprefs = true)
-public class ItemTempRegulator extends ItemRF implements IBauble {
+public class ItemTempRegulator extends ItemForgeEnergy implements IBauble {
 
 	private static final String NAME = "portable_temp_regulator";
 	private final String TAG_TIME = "TimeStart";

@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Maps;
 
-import cofh.redstoneflux.api.IEnergyReceiver;
-import cofh.redstoneflux.api.IEnergyStorage;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,6 +20,9 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import p455w0rd.tanaddons.init.ModConfig.Options;
 import toughasnails.api.TANPotions;
 import toughasnails.api.stat.capability.ITemperature;
@@ -33,7 +34,7 @@ import toughasnails.temperature.TemperatureHandler;
  * @author p455w0rd
  *
  */
-public class TileTempRegulator extends TileEntity implements ITickable, IEnergyStorage, IEnergyReceiver {
+public class TileTempRegulator extends TileEntity implements ITickable {
 
 	private int INPUT = 10000;
 	private final int ENERGY_USE;
@@ -51,6 +52,54 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 	}
 
 	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		return capability == CapabilityEnergy.ENERGY;
+	}
+
+	@Override
+	@Nullable
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		return hasCapability(capability, facing) ? CapabilityEnergy.ENERGY.cast(new IEnergyStorage() {
+
+			@Override
+			public int receiveEnergy(int input, boolean simulate) {
+				int energyReceived = Math.min(Options.TEMP_REGULATOR_RF_CAPACITY - ENERGY, Math.min(INPUT, input));
+				if (!simulate) {
+					ENERGY += energyReceived;
+				}
+				return energyReceived;
+			}
+
+			@Override
+			public int extractEnergy(int paramInt, boolean simulate) {
+				return 0;
+			}
+
+			@Override
+			public int getEnergyStored() {
+				return ENERGY;
+			}
+
+			@Override
+			public int getMaxEnergyStored() {
+				return Options.TEMP_REGULATOR_RF_CAPACITY;
+			}
+
+			@Override
+			public boolean canExtract() {
+				return false;
+			}
+
+			@Override
+			public boolean canReceive() {
+				return true;
+			}
+
+		}) : null;
+
+	}
+
+	@Override
 	public void markDirty() {
 		super.markDirty();
 		if (getWorld() != null) {
@@ -63,6 +112,30 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 
 	public int getMode() {
 		return REDSTONE_MODE;
+	}
+
+	private IEnergyStorage getEnergyCap() {
+		return getCapability(CapabilityEnergy.ENERGY, null);
+	}
+
+	public int getEnergyStored() {
+		return getEnergyCap().getEnergyStored();
+	}
+
+	public int getEnergyUse() {
+		return ENERGY_USE;
+	}
+
+	private void setEnergyStored(int amount) {
+		if (amount > Options.TEMP_REGULATOR_RF_CAPACITY) {
+			ENERGY = Options.TEMP_REGULATOR_RF_CAPACITY;
+			return;
+		}
+		if (amount < 0) {
+			ENERGY = 0;
+			return;
+		}
+		ENERGY = amount;
 	}
 
 	public boolean isRunning() {
@@ -84,66 +157,6 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 		}
 		REDSTONE_MODE = newMode;
 		markDirty();
-	}
-
-	@Override
-	public int getEnergyStored(EnumFacing paramEnumFacing) {
-		return ENERGY;
-	}
-
-	@Override
-	public int getMaxEnergyStored(EnumFacing paramEnumFacing) {
-		return Options.TEMP_REGULATOR_RF_CAPACITY;
-	}
-
-	public int getEnergyUse() {
-		return ENERGY_USE;
-	}
-
-	@Override
-	public boolean canConnectEnergy(EnumFacing paramEnumFacing) {
-		return true;
-	}
-
-	private void setEnergyStored(int amount) {
-		if (amount > Options.TEMP_REGULATOR_RF_CAPACITY) {
-			ENERGY = Options.TEMP_REGULATOR_RF_CAPACITY;
-			return;
-		}
-		if (amount < 0) {
-			ENERGY = 0;
-			return;
-		}
-		ENERGY = amount;
-	}
-
-	@Override
-	public int receiveEnergy(EnumFacing paramEnumFacing, int input, boolean simulate) {
-		int energyReceived = Math.min(Options.TEMP_REGULATOR_RF_CAPACITY - ENERGY, Math.min(INPUT, input));
-		if (!simulate) {
-			ENERGY += energyReceived;
-		}
-		return energyReceived;
-	}
-
-	@Override
-	public int receiveEnergy(int input, boolean simulate) {
-		return receiveEnergy(EnumFacing.DOWN, input, simulate);
-	}
-
-	@Override
-	public int extractEnergy(int paramInt, boolean simulate) {
-		return 0;
-	}
-
-	@Override
-	public int getEnergyStored() {
-		return ENERGY;
-	}
-
-	@Override
-	public int getMaxEnergyStored() {
-		return Options.TEMP_REGULATOR_RF_CAPACITY;
 	}
 
 	@Override
@@ -194,7 +207,7 @@ public class TileTempRegulator extends TileEntity implements ITickable, IEnergyS
 			IBlockState state = getWorld().getBlockState(pos);
 			state.getBlock().updateTick(getWorld(), getPos(), state, getWorld().rand);
 		}
-		if (!isRunning() || getWorld() == null || getEnergyStored(null) < ENERGY_USE) {
+		if (!isRunning() || getWorld() == null || getEnergyStored() < ENERGY_USE) {
 			return;
 		}
 

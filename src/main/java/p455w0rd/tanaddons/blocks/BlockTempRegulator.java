@@ -72,6 +72,7 @@ public class BlockTempRegulator extends BlockContainer {
 		compound.setInteger(TAG_ENERGY, Options.TEMP_REGULATOR_RF_CAPACITY);
 		compound.setInteger(TAG_MODE, 2);
 		full.setTagInfo("BlockEntityTag", compound);
+		tab.add(new ItemStack(this));
 		tab.add(full);
 	}
 
