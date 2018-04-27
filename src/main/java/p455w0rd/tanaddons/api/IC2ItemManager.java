@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.energy.CapabilityEnergy;
+import p455w0rd.tanaddons.init.ModGlobals;
 import p455w0rd.tanaddons.init.ModIntegration.Mods;
 import p455w0rd.tanaddons.items.ItemForgeEnergy;
 
@@ -109,7 +110,7 @@ public class IC2ItemManager implements IBackupElectricItemManager {
 
 	@Override
 	public boolean handles(ItemStack stack) {
-		return !stack.isEmpty() && stack.hasCapability(CapabilityEnergy.ENERGY, null);
+		return !stack.isEmpty() && stack.getItem().getRegistryName().getResourceDomain().equals(ModGlobals.MODID) && stack.hasCapability(CapabilityEnergy.ENERGY, null);
 	}
 
 	public ItemForgeEnergy getEnergyItem(ItemStack stack) {
