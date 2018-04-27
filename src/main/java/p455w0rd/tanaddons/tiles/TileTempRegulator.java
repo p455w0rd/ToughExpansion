@@ -53,7 +53,7 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return capability == CapabilityEnergy.ENERGY;
+		return Options.REQUIRE_ENERGY && capability == CapabilityEnergy.ENERGY;
 	}
 
 	@Override
@@ -115,18 +115,27 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 	}
 
 	private IEnergyStorage getEnergyCap() {
-		return getCapability(CapabilityEnergy.ENERGY, null);
+		return Options.REQUIRE_ENERGY ? getCapability(CapabilityEnergy.ENERGY, null) : null;
 	}
 
 	public int getEnergyStored() {
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
 		return getEnergyCap().getEnergyStored();
 	}
 
 	public int getEnergyUse() {
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
 		return ENERGY_USE;
 	}
 
 	private void setEnergyStored(int amount) {
+		if (!Options.REQUIRE_ENERGY) {
+			return;
+		}
 		if (amount > Options.TEMP_REGULATOR_RF_CAPACITY) {
 			ENERGY = Options.TEMP_REGULATOR_RF_CAPACITY;
 			return;
@@ -142,11 +151,11 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 		switch (REDSTONE_MODE) {
 		case 0:
 		default:
-			return (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.isBlockPowered(pos)) && (!Options.REQUIRE_ENERGY || getEnergyStored() > ENERGY_USE);
 		case 1:
-			return (world.isBlockIndirectlyGettingPowered(pos) == 0 && !world.isBlockPowered(pos)) && getEnergyStored() > ENERGY_USE;
+			return (world.isBlockIndirectlyGettingPowered(pos) == 0 && !world.isBlockPowered(pos)) && (!Options.REQUIRE_ENERGY || getEnergyStored() > ENERGY_USE);
 		case 2:
-			return getEnergyStored() > ENERGY_USE;
+			return !Options.REQUIRE_ENERGY || getEnergyStored() > ENERGY_USE;
 		}
 	}
 
@@ -162,7 +171,7 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		if (compound.hasKey(TAG_ENERGY)) {
+		if (Options.REQUIRE_ENERGY && compound.hasKey(TAG_ENERGY)) {
 			ENERGY = compound.getInteger(TAG_ENERGY);
 		}
 		if (compound.hasKey(TAG_MODE)) {
@@ -186,7 +195,9 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
-		compound.setInteger(TAG_ENERGY, ENERGY);
+		if (Options.REQUIRE_ENERGY) {
+			compound.setInteger(TAG_ENERGY, ENERGY);
+		}
 		compound.setInteger(TAG_MODE, REDSTONE_MODE);
 		if (PLAYER_TIMERS.keySet().size() > 0) {
 			NBTTagList tagList = new NBTTagList();
@@ -207,7 +218,7 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 			IBlockState state = getWorld().getBlockState(pos);
 			state.getBlock().updateTick(getWorld(), getPos(), state, getWorld().rand);
 		}
-		if (!isRunning() || getWorld() == null || getEnergyStored() < ENERGY_USE) {
+		if (!isRunning() || getWorld() == null || (Options.REQUIRE_ENERGY && getEnergyStored() < ENERGY_USE)) {
 			return;
 		}
 
@@ -232,11 +243,15 @@ public class TileTempRegulator extends TileEntity implements ITickable {
 							tempHandler.setTemperature(new Temperature(currentTemp - 1));
 						}
 						setTime(player, 100);
-						setEnergyStored(getEnergyStored() - ENERGY_USE);
+						if (Options.REQUIRE_ENERGY) {
+							setEnergyStored(getEnergyStored() - ENERGY_USE);
+						}
 					}
 					else {
 						setTime(player, currentTime - 1);
-						setEnergyStored(getEnergyStored() - ENERGY_USE);
+						if (Options.REQUIRE_ENERGY) {
+							setEnergyStored(getEnergyStored() - ENERGY_USE);
+						}
 					}
 				}
 				else {

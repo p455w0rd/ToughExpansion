@@ -51,7 +51,7 @@ public class ModRecipes {
 				"bcd",
 				"eee",
 				Character.valueOf('a'),
-				new ItemStack(Items.BLAZE_ROD),
+				new ItemStack(TANItems.magma_shard),
 				Character.valueOf('b'),
 				new ItemStack(TANBlocks.temperature_coil),
 				Character.valueOf('c'),
@@ -59,7 +59,7 @@ public class ModRecipes {
 				Character.valueOf('d'),
 				new ItemStack(TANBlocks.temperature_coil, 1, 1),
 				Character.valueOf('e'),
-				new ItemStack(TANItems.freeze_rod)
+				new ItemStack(TANItems.ice_cube)
 		}));
 
 		CRAFTING_RECIPES.add(portableTempRegulator = recipeUtils.addOldShaped(new ItemStack(ModItems.TEMP_REGULATOR), new Object[] {

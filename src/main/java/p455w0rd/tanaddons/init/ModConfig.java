@@ -21,6 +21,7 @@ public class ModConfig {
 			CONFIG = new Configuration(new File(ModGlobals.CONFIG_FILE));
 			MinecraftForge.EVENT_BUS.register(new ModConfig());
 		}
+		Options.REQUIRE_ENERGY = CONFIG.getBoolean("RequireEnergy", DEF_CAT, true, "Set to false to disable energy (Forge Energy) requirement");
 		Options.TEMP_REGULATOR_RADIUS = CONFIG.getInt("TempRegulatorBlockRadius", DEF_CAT, 20, 1, 40, "Effective radius of Temperature Regulator Block");
 		Options.TEMP_REGULATOR_RF_CAPACITY = CONFIG.getInt("TempRegulatorBlockRFCap", DEF_CAT, 1600000, 1, 16000000, "RF Capacity of Temperator Regulator Block");
 		Options.THIRST_HEALTH_REGEN_FIX = CONFIG.getBoolean("ThirstHealthFix", DEF_CAT, true, "Makes health regen respect same logic as hunger. (If player has less than 10 thirst drops, health will not regen.)");
@@ -45,6 +46,7 @@ public class ModConfig {
 
 	public static class Options {
 
+		public static boolean REQUIRE_ENERGY = true;
 		public static int TEMP_REGULATOR_RADIUS = 20;
 		public static int TEMP_REGULATOR_RF_CAPACITY = 1600000;
 		public static boolean THIRST_HEALTH_REGEN_FIX = true;

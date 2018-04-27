@@ -14,6 +14,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import p455w0rd.tanaddons.init.ModConfig.Options;
 
 /**
  * @author p455w0rd
@@ -46,41 +47,43 @@ public class ItemForgeEnergy extends ItemBase {
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		if (isInCreativeTab(tab)) {
 			subItems.add(new ItemStack(this));
-			ItemStack item = new ItemStack(this);
-			setFullEnergy(item);
-			subItems.add(item);
+			if (Options.REQUIRE_ENERGY) {
+				ItemStack item = new ItemStack(this);
+				setFullEnergy(item);
+				subItems.add(item);
+			}
 		}
 	}
 
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
-		return true;
+		return Options.REQUIRE_ENERGY;
 	}
 
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
 		double max = getMaxEnergyStored(stack);
 		return (max - getEnergyStored(stack)) / max;
 	}
 
 	@Override
 	public ICapabilityProvider initCapabilities(@Nonnull final ItemStack stack, @Nullable NBTTagCompound nbt) {
-		return new ICapabilityProvider() {
-
-			@Override
-			public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-				return getForgeEnergyProvider(stack).hasCapability(capability, facing);
-			}
-
-			@Override
-			public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-				return getForgeEnergyProvider(stack).getCapability(capability, facing);
-			}
-		};
+		return getEnergyProvider(stack);
 	}
 
-	protected EnergyStorageSettable getForgeEnergyProvider(ItemStack stack) {
-		return new EnergyStorageSettable(stack, getCapacity(), getMaxReceive(), getMaxExtract());
+	public static ICapabilityProvider getEnergyProvider(ItemStack stack) {
+		return stack.getItem() instanceof ItemForgeEnergy ? ((ItemForgeEnergy) stack.getItem()).getForgeEnergyStorage(stack) : null;
+	}
+
+	public EnergyStorageSettable getForgeEnergyStorage(ItemStack stack) {
+		if (Options.REQUIRE_ENERGY && stack.getItem() instanceof ItemForgeEnergy) {
+			ItemForgeEnergy item = (ItemForgeEnergy) stack.getItem();
+			return new EnergyStorageSettable(stack, item.getCapacity(), item.getMaxReceive(), item.getMaxExtract());
+		}
+		return null;
 	}
 
 	public int getCapacity() {
@@ -96,27 +99,43 @@ public class ItemForgeEnergy extends ItemBase {
 	}
 
 	public void setEnergyStored(ItemStack stack, int amount) {
-		((EnergyStorageSettable) getForgeEnergyProvider(stack).getCapability(CapabilityEnergy.ENERGY, null)).setEnergyStored(amount);
+		if (Options.REQUIRE_ENERGY) {
+			getForgeEnergyStorage(stack).setEnergyStored(amount);
+		}
 	}
 
 	public int getEnergyStored(ItemStack stack) {
-		return ((EnergyStorageSettable) getForgeEnergyProvider(stack).getCapability(CapabilityEnergy.ENERGY, null)).getEnergyStored();
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
+		return getForgeEnergyStorage(stack).getEnergyStored();
 	}
 
 	public int getMaxEnergyStored(ItemStack stack) {
-		return ((EnergyStorageSettable) getForgeEnergyProvider(stack).getCapability(CapabilityEnergy.ENERGY, null)).getMaxEnergyStored();
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
+		return getForgeEnergyStorage(stack).getMaxEnergyStored();
 	}
 
 	public int extractEnergy(ItemStack stack, int amount, boolean simulate) {
-		return ((EnergyStorageSettable) getForgeEnergyProvider(stack).getCapability(CapabilityEnergy.ENERGY, null)).extractEnergy(amount, simulate);
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
+		return getForgeEnergyStorage(stack).extractEnergy(amount, simulate);
 	}
 
 	public int receiveEnergy(ItemStack stack, int amount, boolean simulate) {
-		return ((EnergyStorageSettable) getForgeEnergyProvider(stack).getCapability(CapabilityEnergy.ENERGY, null)).receiveEnergy(amount, simulate);
+		if (!Options.REQUIRE_ENERGY) {
+			return 0;
+		}
+		return getForgeEnergyStorage(stack).receiveEnergy(amount, simulate);
 	}
 
 	public void setFullEnergy(ItemStack stack) {
-		setEnergyStored(stack, getMaxEnergyStored(stack));
+		if (Options.REQUIRE_ENERGY) {
+			setEnergyStored(stack, getMaxEnergyStored(stack));
+		}
 	}
 
 	public static class EnergyStorageSettable implements IEnergyStorage, ICapabilityProvider {
@@ -199,13 +218,20 @@ public class ItemForgeEnergy extends ItemBase {
 		}
 
 		@Override
-		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
 			return capability == CapabilityEnergy.ENERGY;
 		}
 
+		@Nullable
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			return hasCapability(capability, facing) ? CapabilityEnergy.ENERGY.cast(this) : null;
+			if (capability == CapabilityEnergy.ENERGY) {
+				if (stack.getItem() instanceof ItemForgeEnergy) {
+					EnergyStorageSettable storage = ((ItemForgeEnergy) stack.getItem()).getForgeEnergyStorage(stack);
+					return CapabilityEnergy.ENERGY.cast(storage);
+				}
+			}
+			return null;
 		}
 
 	}

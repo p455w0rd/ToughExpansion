@@ -28,8 +28,8 @@ import p455w0rd.tanaddons.init.ModCreativeTab;
 import p455w0rd.tanaddons.init.ModGlobals;
 import p455w0rdslib.util.ReadableNumberConverter;
 import toughasnails.api.TANPotions;
+import toughasnails.api.config.GameplayOption;
 import toughasnails.api.config.SyncedConfig;
-import toughasnails.api.config.TemperatureOption;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.temperature.Temperature;
 import toughasnails.api.temperature.TemperatureHelper;
@@ -63,8 +63,8 @@ public class ItemTempRegulator extends ItemForgeEnergy implements IBauble {
 	private void doTick(Entity entity, ItemStack stack) {
 		init(stack);
 		int energy = Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
-		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(TemperatureOption.ENABLE_TEMPERATURE)) {
-			if (getEnergyStored(stack) < energy) {
+		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_TEMPERATURE)) {
+			if (Options.REQUIRE_ENERGY && getEnergyStored(stack) < energy) {
 				return;
 			}
 
@@ -86,11 +86,15 @@ public class ItemTempRegulator extends ItemForgeEnergy implements IBauble {
 						tempHandler.setTemperature(new Temperature(currentTemp - 1));
 					}
 					setTime(stack, 100);
-					setEnergyStored(stack, getEnergyStored(stack) - energy);
+					if (Options.REQUIRE_ENERGY) {
+						setEnergyStored(stack, getEnergyStored(stack) - energy);
+					}
 				}
 				else {
 					setTime(stack, currentTime - 1);
-					setEnergyStored(stack, getEnergyStored(stack) - energy);
+					if (Options.REQUIRE_ENERGY) {
+						setEnergyStored(stack, getEnergyStored(stack) - energy);
+					}
 				}
 			}
 			else {
@@ -103,7 +107,7 @@ public class ItemTempRegulator extends ItemForgeEnergy implements IBauble {
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) < 100 && getEnergyStored(stack) > Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK;
+		return getTime(stack) < 100 && (!Options.REQUIRE_ENERGY || getEnergyStored(stack) > Options.PORTABLE_TEMP_REGULATOR_RF_PER_TICK);
 	}
 
 	private int getTime(ItemStack stack) {
@@ -127,10 +131,14 @@ public class ItemTempRegulator extends ItemForgeEnergy implements IBauble {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
-		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " RF");
-		tooltip.add("");
+		if (Options.REQUIRE_ENERGY) {
+			tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " Energy");
+			tooltip.add("");
+		}
 		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc"));
-		tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
+		if (Options.REQUIRE_ENERGY) {
+			tooltip.add(I18n.format("tooltip.tanaddons.ptempregulator.desc2"));
+		}
 		if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
 			tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
 		}

@@ -26,10 +26,22 @@ public class ModEvents {
 		MinecraftForge.EVENT_BUS.register(new ModEvents());
 	}
 
+	/*
+		@SubscribeEvent
+		public void itemCapabilityAttach(AttachCapabilitiesEvent<ItemStack> event) {
+			ItemStack stack = event.getObject();
+			if (stack.isEmpty() || !(stack.getItem() instanceof ItemForgeEnergy) || stack.hasCapability(CapabilityEnergy.ENERGY, null) || event.getCapabilities().values().stream().anyMatch(c -> c.hasCapability(CapabilityEnergy.ENERGY, null))) {
+				return;
+			}
+
+			event.addCapability(new ResourceLocation(ModGlobals.MODID, "fe_cap"), ItemForgeEnergy.getEnergyProvider(stack));
+		}
+	*/
 	@SideOnly(Side.SERVER)
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
 		Map<String, Object> configs = new HashMap<String, Object>();
+		configs.put("RequireEnergy", Options.REQUIRE_ENERGY);
 		configs.put("TempRegulatorBlockRadius", Options.TEMP_REGULATOR_RADIUS);
 		configs.put("TempRegulatorBlockRFCap", Options.TEMP_REGULATOR_RF_CAPACITY);
 		configs.put("ThirstHealthFix", Options.THIRST_HEALTH_REGEN_FIX);

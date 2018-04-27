@@ -73,17 +73,13 @@ public class PacketConfigSync implements IMessage {
 	public static class Handler implements IMessageHandler<PacketConfigSync, IMessage> {
 		@Override
 		public IMessage onMessage(final PacketConfigSync message, final MessageContext ctx) {
-			FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(new Runnable() {
-				@Override
-				public void run() {
-					handle(message, ctx);
-				}
-			});
+			FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
 			return null;
 		}
 
 		private void handle(PacketConfigSync message, MessageContext ctx) {
 			if (ctx.getClientHandler() != null) {
+				Options.REQUIRE_ENERGY = (Boolean) message.values.get("RequireEnergy");
 				Options.TEMP_REGULATOR_RADIUS = (Integer) message.values.get("TempRegulatorBlockRadius");
 				Options.TEMP_REGULATOR_RF_CAPACITY = (Integer) message.values.get("TempRegulatorBlockRFCap");
 				Options.THIRST_HEALTH_REGEN_FIX = (Boolean) message.values.get("ThirstHealthFix");

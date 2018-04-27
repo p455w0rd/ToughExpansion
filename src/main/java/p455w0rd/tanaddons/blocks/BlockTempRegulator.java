@@ -6,6 +6,7 @@ import static p455w0rd.tanaddons.tiles.TileTempRegulator.TAG_MODE;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockContainer;
@@ -61,19 +62,20 @@ public class BlockTempRegulator extends BlockContainer {
 		itemBlock.setRegistryName(NAME);
 		ForgeRegistries.ITEMS.register(itemBlock);
 		setCreativeTab(ModCreativeTab.TAB);
-		//ForgeRegistries.ITEMS.register(new ItemBlock(this));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubBlocks(CreativeTabs itemIn, NonNullList<ItemStack> tab) {
-		ItemStack full = new ItemStack(this);
-		NBTTagCompound compound = new NBTTagCompound();
-		compound.setInteger(TAG_ENERGY, Options.TEMP_REGULATOR_RF_CAPACITY);
-		compound.setInteger(TAG_MODE, 2);
-		full.setTagInfo("BlockEntityTag", compound);
 		tab.add(new ItemStack(this));
-		tab.add(full);
+		if (Options.REQUIRE_ENERGY) {
+			ItemStack full = new ItemStack(this);
+			NBTTagCompound compound = new NBTTagCompound();
+			compound.setInteger(TAG_ENERGY, Options.TEMP_REGULATOR_RF_CAPACITY);
+			compound.setInteger(TAG_MODE, 2);
+			full.setTagInfo("BlockEntityTag", compound);
+			tab.add(full);
+		}
 	}
 
 	@Override
@@ -91,11 +93,12 @@ public class BlockTempRegulator extends BlockContainer {
 				}
 			}
 			else {
-				if (player.isSneaking()) {
-					player.sendMessage(new TextComponentString("RF: " + getTE(world, pos).getEnergyStored() + " (" + getTE(world, pos).getEnergyUse() + " RF/t per player while adjusting temp)"));
+				if (Options.REQUIRE_ENERGY && player.isSneaking()) {
+					String energy = I18n.format("tooltip.tanaddons.energy");
+					String energyPerTick = I18n.format("tooltip.tanaddons.energy2");
+					player.sendMessage(new TextComponentString(energy + ": " + getTE(world, pos).getEnergyStored() + " (" + getTE(world, pos).getEnergyUse() + " " + energyPerTick + ")"));
 				}
 				else {
-
 					String[] msg = {
 							"message.tanaddons.noredstonerequired",
 							"message.tanaddons.redstoneignored",
@@ -179,9 +182,20 @@ public class BlockTempRegulator extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
+		String[] msg = {
+				"message.tanaddons.noredstonerequired",
+				"message.tanaddons.redstoneignored",
+				"message.tanaddons.redstonerequired"
+		};
 		tooltip.add("");
+		if (Options.REQUIRE_ENERGY) {
+			tooltip.add(I18n.format("tooltip.tanaddons.energy") + ": " + getEnergyFromStack(stack));
+		}
+		tooltip.add(I18n.format("tooltip.tanaddons.redstone_mode") + ": " + I18n.format(msg[getRedstoneModeFromStack(stack)]));
 		tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc"));
-		tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc2"));
+		if (Options.REQUIRE_ENERGY) {
+			tooltip.add(I18n.format("tooltip.tanaddons.redstone_rclick.desc2"));
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -195,12 +209,41 @@ public class BlockTempRegulator extends BlockContainer {
 	}
 
 	@Override
-	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, @Nullable ItemStack stack) {
+	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, @Nonnull ItemStack stack) {
+		if (te == null || stack.isEmpty()) {
+			return;
+		}
 		ItemStack itemstack = new ItemStack(this);
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		te.writeToNBT(nbttagcompound);
 		itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
 		spawnAsEntity(worldIn, pos, itemstack);
+	}
+
+	private NBTTagCompound getBlockTagFromStack(ItemStack stack) {
+		NBTTagCompound nbt = null;
+		if (stack.hasTagCompound()) {
+			if (stack.getTagCompound().hasKey("BlockEntityTag")) {
+				nbt = stack.getTagCompound().getCompoundTag("BlockEntityTag");
+			}
+		}
+		return nbt;
+	}
+
+	private int getEnergyFromStack(ItemStack stack) {
+		NBTTagCompound nbt = getBlockTagFromStack(stack);
+		if (nbt != null && nbt.hasKey(TAG_ENERGY)) {
+			return nbt.getInteger(TAG_ENERGY);
+		}
+		return 0;
+	}
+
+	private int getRedstoneModeFromStack(ItemStack stack) {
+		NBTTagCompound nbt = getBlockTagFromStack(stack);
+		if (nbt != null && nbt.hasKey(TAG_MODE)) {
+			return nbt.getInteger(TAG_MODE);
+		}
+		return 0;
 	}
 
 }

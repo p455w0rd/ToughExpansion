@@ -37,6 +37,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -56,6 +57,7 @@ import toughasnails.api.TANPotions;
 import toughasnails.api.config.GameplayOption;
 import toughasnails.api.config.SyncedConfig;
 import toughasnails.api.thirst.ThirstHelper;
+import toughasnails.fluids.PurifiedWaterFluid;
 import toughasnails.thirst.ThirstHandler;
 
 /**
@@ -68,8 +70,8 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 	private static final String NAME = "thirst_quencher";
 	private final int FLUID_CAPACITY;
 	protected int FLUID_STORED = 0;
-	private final String TAG_FLUID_STORED = "FluidStored";
-	private final String TAG_TIME = "TimeStart";
+	public static final String TAG_FLUID_STORED = "FluidStored";
+	public static final String TAG_TIME = "TimeStart";
 
 	public ItemThirstQuencher() {
 		super(Options.THIRST_QUENCHER_RF_CAPACITY, Options.THIRST_QUENCHER_RF_CAPACITY, 40, NAME);
@@ -84,60 +86,26 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 
 			@Override
 			public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-				return getFluidProvider(stack).hasCapability(capability, facing) || getForgeEnergyProvider(stack).hasCapability(capability, facing);
+				return capability == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY || (Options.REQUIRE_ENERGY && capability == CapabilityEnergy.ENERGY);
 			}
 
 			@Override
 			public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-				return capability == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY ? getFluidProvider(stack).getCapability(capability, facing) : capability == CapabilityEnergy.ENERGY ? getForgeEnergyProvider(stack).getCapability(capability, facing) : null;
+				return capability == CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY ? CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.cast((FluidHandlerItemStackSettable) getFluidProvider(stack)) : (Options.REQUIRE_ENERGY && capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(getForgeEnergyStorage(stack)) : null;
 			}
 
 		};
 	}
 
-	protected FluidHandlerItemStack getFluidProvider(ItemStack stack) {
-		return new FluidHandlerItemStack(stack, FLUID_CAPACITY) {
+	public FluidHandlerItemStackSettable getFluidStorage(ItemStack stack) {
+		if (stack.getItem() instanceof ItemThirstQuencher) {
+			return new FluidHandlerItemStackSettable(stack, FLUID_CAPACITY);
+		}
+		return null;
+	}
 
-			@Override
-			public FluidStack getFluid() {
-				return new FluidStack(FluidRegistry.WATER, FLUID_STORED);
-			}
-
-			@Override
-			public int fill(FluidStack resource, boolean doFill) {
-				if (container.getCount() != 1 || resource == null || resource.amount <= 0 || !canFillFluidType(resource)) {
-					return 0;
-				}
-
-				FluidStack contained = getFluid();
-				if (contained == null) {
-					int fillAmount = Math.min(FLUID_CAPACITY, resource.amount);
-
-					if (doFill) {
-						FluidStack filled = resource.copy();
-						filled.amount = fillAmount;
-						setFluid(filled);
-					}
-					setFluidStored(stack, fillAmount);
-					return fillAmount;
-				}
-				else {
-					if (contained.isFluidEqual(resource)) {
-						int fillAmount = Math.min(FLUID_CAPACITY - contained.amount, resource.amount);
-
-						if (doFill && fillAmount > 0) {
-							contained.amount += fillAmount;
-							setFluid(contained);
-						}
-						setFluidStored(stack, fillAmount);
-						return fillAmount;
-					}
-
-					return 0;
-				}
-			}
-
-		};
+	protected ICapabilityProvider getFluidProvider(ItemStack stack) {
+		return stack.getItem() instanceof ItemThirstQuencher ? ((ItemThirstQuencher) stack.getItem()).getFluidStorage(stack) : null;
 	}
 
 	@Override
@@ -146,29 +114,27 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 			ItemStack item = new ItemStack(this);
 			ItemStack item2 = new ItemStack(this);
 			ItemStack item3 = new ItemStack(this);
-			setFullEnergy(item);
-			addFluid(item2, FLUID_CAPACITY);
-			addFluid(item3, FLUID_CAPACITY);
-			setFullEnergy(item3);
+			setFluidStored(item2, FLUID_CAPACITY);
 			subItems.add(new ItemStack(this)); // 0 RF - 0 Fluid
-			subItems.add(item); // full RF - 0 fluid
+			if (Options.REQUIRE_ENERGY) {
+				setFullEnergy(item);
+				subItems.add(item); // full RF - 0 fluid
+			}
 			subItems.add(item2); // 0 RF - full fluid
-			subItems.add(item3); // full RF - full fluid
+			if (Options.REQUIRE_ENERGY) {
+				setFluidStored(item3, FLUID_CAPACITY);
+				setFullEnergy(item3);
+				subItems.add(item3); // full RF - full fluid
+			}
 		}
 	}
 
 	public int getFluidStored(ItemStack stack) {
-		init(stack);
-		return stack.getTagCompound().getInteger(TAG_FLUID_STORED);
+		return getFluidStorage(stack).getFluidStored();
 	}
 
 	private void setFluidStored(ItemStack stack, int amount) {
-		init(stack);
-		stack.getTagCompound().setInteger(TAG_FLUID_STORED, amount);
-	}
-
-	private void addFluid(ItemStack stack, int amount) {
-		setFluidStored(stack, getFluidStored(stack) + amount);
+		getFluidStorage(stack).setFluidStored(amount);
 	}
 
 	private int getTime(ItemStack stack) {
@@ -205,7 +171,7 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 	private void doTick(Entity entity, ItemStack stack) {
 		if (entity instanceof EntityPlayer && SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST)) {
 			int energyPerTick = Options.THIRST_QUNCHER_RF_PER_TICK;
-			if (getEnergyStored(stack) < energyPerTick || getFluidStored(stack) < 100) {
+			if (Options.REQUIRE_ENERGY && (getEnergyStored(stack) < energyPerTick || getFluidStored(stack) < 100)) {
 				return;
 			}
 			EntityPlayer player = (EntityPlayer) entity;
@@ -222,11 +188,15 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 					}
 					drainFluid(stack, 100);
 					setTime(stack, 50);
-					setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
+					if (Options.REQUIRE_ENERGY) {
+						setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
+					}
 				}
 				else {
 					setTime(stack, currentTime - 1);
-					setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
+					if (Options.REQUIRE_ENERGY) {
+						setEnergyStored(stack, getEnergyStored(stack) - energyPerTick);
+					}
 				}
 			}
 			else {
@@ -261,15 +231,16 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 				worldIn.setBlockState(blockpos, Blocks.AIR.getDefaultState(), 11);
 				playerIn.addStat(StatList.getObjectUseStats(this));
 				playerIn.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-				addFluid(stack, 1000);
+				setFluidStored(stack, Math.min(getFluidStored(stack) + 1000, FLUID_CAPACITY));
 				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 			}
 			else if (iblockstate.getBlock().hasTileEntity(iblockstate) && worldIn.getTileEntity(blockpos).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, ray.sideHit)) {
 				IFluidHandler fluidHandler = worldIn.getTileEntity(blockpos).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, ray.sideHit);
 				for (IFluidTankProperties property : fluidHandler.getTankProperties()) {
-					if (property.getContents().getFluid() == FluidRegistry.WATER && property.getContents().amount >= 1000 && property.canDrain()) {
+					Fluid containedFluid = property.getContents().getFluid();
+					if ((containedFluid == FluidRegistry.WATER || containedFluid == PurifiedWaterFluid.instance) && property.getContents().amount >= 1000 && property.canDrain()) {
 						fluidHandler.drain(new FluidStack(FluidRegistry.WATER, 1000), true);
-						addFluid(stack, 1000);
+						setFluidStored(stack, Math.min(getFluidStored(stack) + 1000, FLUID_CAPACITY));
 					}
 				}
 			}
@@ -280,7 +251,7 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		return getTime(stack) < 50 && getEnergyStored(stack) > 10;
+		return getTime(stack) < 50 && (!Options.REQUIRE_ENERGY || getEnergyStored(stack) > 10);
 	}
 
 	@Override
@@ -294,12 +265,19 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
-		tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " Energy");
+		if (Options.REQUIRE_ENERGY) {
+			tooltip.add(ChatFormatting.ITALIC + "" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getEnergyStored(stack)) + "/" + ReadableNumberConverter.INSTANCE.toWideReadableForm(getMaxEnergyStored(stack)) + " Energy");
+		}
 		tooltip.add("Stored Water: " + getFluidStored(stack) + "/" + FLUID_CAPACITY + " mB");
 		tooltip.add("");
 		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc"));
-		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc2"));
-		tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc3"));
+		String requirementMessage = I18n.format("tooltip.tanaddons.thirstquencher.desc2");
+		if (Options.REQUIRE_ENERGY) {
+			requirementMessage += " " + I18n.format("tooltip.tanaddons.thirstquencher.desc4");
+		}
+		//requirementMessage += " " + I18n.format("tooltip.tanaddons.thirstquencher.desc4");
+		tooltip.add(requirementMessage + " " + I18n.format("tooltip.tanaddons.thirstquencher.desc5"));
+		//tooltip.add(I18n.format("tooltip.tanaddons.thirstquencher.desc3"));
 		if (Loader.isModLoaded(ModGlobals.MODID_BAUBLES)) {
 			tooltip.add(I18n.format("tooltip.tanaddons.baublesitem", "any"));
 		}
@@ -330,6 +308,87 @@ public class ItemThirstQuencher extends ItemForgeEnergy implements IBauble {
 	@Method(modid = MODID_BAUBLES)
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
 		return true;
+	}
+
+	public static class FluidHandlerItemStackSettable extends FluidHandlerItemStack {
+
+		ItemThirstQuencher item;
+
+		public FluidHandlerItemStackSettable(ItemStack container, int capacity) {
+			super(container, capacity);
+			if (container.getItem() instanceof ItemThirstQuencher) {
+				item = (ItemThirstQuencher) container.getItem();
+			}
+		}
+
+		@Override
+		public FluidStack getFluid() {
+			return new FluidStack(FluidRegistry.WATER, item.getFluidStored(getContainer()));
+		}
+
+		@Override
+		public int fill(FluidStack resource, boolean doFill) {
+			if (getContainer().getCount() != 1 || resource == null || resource.amount <= 0 || !canFillFluidType(resource)) {
+				return 0;
+			}
+
+			FluidStack contained = getFluid();
+			if (contained == null) {
+				int fillAmount = Math.min(item.FLUID_CAPACITY, resource.amount);
+
+				FluidStack filled = resource.copy();
+				if (doFill) {
+					filled.amount = fillAmount;
+					setFluid(filled);
+				}
+				setFluidStored(filled.amount);
+				return fillAmount;
+			}
+			else {
+				if (!contained.isFluidEqual(resource)) {
+					resource = new FluidStack(contained, resource.amount);
+				}
+				int fillAmount = Math.min(item.FLUID_CAPACITY - contained.amount, resource.amount);
+
+				if (doFill && fillAmount > 0) {
+					contained.amount += fillAmount;
+					setFluid(contained);
+				}
+				setFluidStored(contained.amount);
+				return fillAmount;
+
+			}
+		}
+
+		@Override
+		public boolean canFillFluidType(FluidStack stack) {
+			Fluid fluid = stack.getFluid();
+			return fluid == FluidRegistry.WATER || fluid == PurifiedWaterFluid.instance;
+		}
+
+		public int getFluidStored() {
+			init(getContainer());
+			return getContainer().getTagCompound().getInteger(TAG_FLUID_STORED);
+		}
+
+		private void setFluidStored(int amount) {
+			init(getContainer());
+			getContainer().getTagCompound().setInteger(TAG_FLUID_STORED, amount);
+		}
+
+		private void init(ItemStack stack) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			NBTTagCompound nbt = stack.getTagCompound();
+			if (!nbt.hasKey(ItemThirstQuencher.TAG_FLUID_STORED)) {
+				nbt.setInteger(TAG_FLUID_STORED, 0);
+			}
+			if (!nbt.hasKey(TAG_TIME)) {
+				nbt.setInteger(TAG_TIME, 100);
+			}
+		}
+
 	}
 
 }
